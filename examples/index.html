@@ -421,6 +421,10 @@
         color: var(--chalk);
       }
 
+      .input-shell {
+        display: block;
+      }
+
       .rule-wrap {
         display: grid;
         gap: 10px;
@@ -575,6 +579,11 @@
           grid-template-columns: 1fr;
         }
 
+        pre {
+          overflow-wrap: anywhere;
+          white-space: pre-wrap;
+        }
+
         .footer {
           display: grid;
         }
@@ -632,7 +641,7 @@
                 <span class="state-label" data-state="idle">idle / solid</span>
               </div>
               <div class="button-cell">
-                <button class="demo-button" id="btn-loading" type="button">Mapping star chart…</button>
+                <button class="demo-button" id="btn-loading" type="button" disabled aria-busy="true">Mapping star chart…</button>
                 <span class="state-label" data-state="loading">loading</span>
               </div>
               <div class="button-cell">
@@ -685,9 +694,11 @@
                   <input type="checkbox" checked />
                 </span>
               </label>
-              <label class="text-field" id="input-control">
+              <label class="text-field">
                 <span>Workspace name</span>
-                <input type="text" value="North star / chalk studies" />
+                <span class="input-shell" id="input-control">
+                  <input type="text" value="North star / chalk studies" />
+                </span>
               </label>
               <div class="rule-wrap">
                 <small>chalkablyDivider</small>

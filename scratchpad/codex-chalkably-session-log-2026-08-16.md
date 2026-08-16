@@ -22,3 +22,11 @@
 - Verified the responsive demo at 390 × 844 with no horizontal overflow.
 - Captured and validated a 9.7-second H.264 Helium recording, uploaded it to Drive, enabled public access, and confirmed the anonymous link returns HTTP 200.
 - Passed the final gate: TypeScript check, 53 tests, build, package dry-run, SVG parsing, diff validation, complete namespace scan, and banned-assertion scan.
+
+## 2026-08-16 — Cosmic Chalk theme
+
+- Added the reusable `chalkably/themes/cosmic.css` export with moon, comet, starlight, neutral, error, success, paper, and stroke tokens.
+- Applied the theme across the full demo and SVG previews with a midnight board, restrained stars, orbit marks, cosmic copy, and matching code surfaces.
+- The first Helium pass found subtle keyboard focus, clipped mobile code, an enabled loading button, and a cramped input label. Fixed all four before the final captures.
+- The clean Helium pass verified visible keyboard focus, disabled busy state, working controls, no console errors, and no horizontal overflow at desktop or 390 px.
+- Passed the full package gate with 53 tests, type-check, build, package dry-run, SVG validation, and diff validation.

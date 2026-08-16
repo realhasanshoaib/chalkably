@@ -34,6 +34,8 @@
 :where([data-chalkably-theme="cosmic"], .chalkably-theme-cosmic)
   :is(.chalkably-checkbox, .chalkably-radio, .chalkably-toggle, .chalkably-inputbox):has(:focus-visible) {
   --chalkably-ink: var(--chalkably-comet);
+  outline: 2px dashed var(--chalkably-comet);
+  outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

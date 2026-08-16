@@ -1,0 +1,88 @@
+<rr-doc title="Chalkably v0.1" register="spec" project="drawably" risk="minor" summary="A faithful chalk translation of Drawably's seven accessible controls.">
+<rr-deck>
+  <rr-slide spine="Why" title="One small idea, redrawn in chalk" kicker="DRAFT · v0.1">
+    <p class="lede">Keep Drawably's tiny API, native controls, seeded SVG paths, and gentle boil. Change the material from pen ink to powdered chalk.</p>
+    <rr-beat>
+      <rr-panes>
+        <rr-before label="Current"><p>Opaque blue double strokes read as a lively pen sketch.</p></rr-before>
+        <rr-after label="Desired"><p>Layered warm-white strokes have gaps, soft edges, and a faint dusty echo.</p></rr-after>
+      </rr-panes>
+    </rr-beat>
+    <rr-beat><rr-callout>The first release is a faithful translation, not a broad chalkboard design system.</rr-callout></rr-beat>
+  </rr-slide>
+
+  <rr-slide spine="Look" title="The stroke must carry the chalk effect" kicker="VISUAL CONTRACT">
+    <rr-mockup id="chalk-preview" app="Chalkably" url="localhost/examples/" label="proposed control language">
+      <style>
+        .board { min-height: 260px; box-sizing: border-box; padding: 34px; color: #f4f0df; font: 16px/1.5 Inter, system-ui, sans-serif; background-color: #243a36; background-image: radial-gradient(circle at 18% 30%, rgba(255,255,255,.035) 0 1px, transparent 1.5px), radial-gradient(circle at 74% 66%, rgba(0,0,0,.08) 0 1px, transparent 1.5px); background-size: 19px 23px, 29px 31px; }
+        .row { display:flex; flex-wrap:wrap; align-items:center; gap:24px; }
+        .chalk-button { position:relative; border:0; color:#f4f0df; background:transparent; padding:11px 20px; font:600 16px/1 Inter,system-ui,sans-serif; }
+        .chalk-button::before,.chalk-button::after { content:""; position:absolute; inset:2px; border:2px solid rgba(244,240,223,.86); border-radius:7px 10px 6px 9px; transform:rotate(-.35deg); }
+        .chalk-button::after { inset:4px 1px 1px 4px; opacity:.36; border-style:dashed; border-width:1px 2px 2px 1px; transform:rotate(.45deg); }
+        .check { display:flex; align-items:center; gap:10px; }
+        .box { width:20px; height:20px; border:2px solid rgba(244,240,223,.8); border-radius:3px 5px 2px 4px; position:relative; }
+        .box::after { content:"✓"; position:absolute; left:2px; top:-7px; font:700 25px/1 system-ui; transform:rotate(-7deg); text-shadow:1px 0 rgba(244,240,223,.25); }
+        .divider { height:2px; width:100%; margin:26px 0; background:repeating-linear-gradient(90deg,rgba(244,240,223,.85) 0 8px,rgba(244,240,223,.25) 8px 10px,transparent 10px 12px); transform:rotate(-.15deg); }
+        .note { color:rgba(244,240,223,.68); font-size:13px; }
+      </style>
+      <div class="board">
+        <div class="row"><button class="chalk-button">Save sketch</button><label class="check"><span class="box"></span>Keep the texture</label></div>
+        <div class="divider"></div>
+        <div class="note">Warm white chalk · deep slate board · uneven density · readable first</div>
+      </div>
+    </rr-mockup>
+    <rr-beat><p>The board grain supports the scene, but the layered stroke must still read as chalk on a plain dark surface.</p></rr-beat>
+  </rr-slide>
+
+  <rr-slide spine="Scope" title="Version 0.1 stops at a complete translation" kicker="DONE">
+    <rr-cols2>
+      <rr-card><h3>In scope</h3><p>Seven existing controls, vanilla and React, deterministic seeds, chalk states, reduced motion, demo, docs, tests, and MIT attribution.</p></rr-card>
+      <rr-card><h3>Not in scope</h3><p>New controls, canvas, new frameworks, a hosted docs site, npm publication, a light-surface theme, or a general design system.</p></rr-card>
+    </rr-cols2>
+    <rr-beat><rr-callout tone="green">The quality bar is recognition at a glance without losing focus, forms, labels, or readable motion.</rr-callout></rr-beat>
+  </rr-slide>
+
+  <rr-slide spine="System" title="Change the material at one seam" kicker="ARCHITECTURE">
+    <rr-stack label="Control call path">
+      <rr-frame fn="chalkablyButton" file="src/controls.ts" note="validates and owns lifecycle">
+        <rr-frame fn="attachChrome" file="src/controls.ts" note="renders decorative SVG and state">
+          <rr-frame fn="roughRoundedRect" file="src/rough.ts" note="returns seeded geometry" tone="new"></rr-frame>
+        </rr-frame>
+      </rr-frame>
+    </rr-stack>
+    <rr-beat>
+      <rr-types label="Contracts that stay small">
+        <rr-sig name="attachControl(element, options?) → SketchHandle"></rr-sig>
+        <rr-sig name="roughShape(geometry, options) → SVG path string"></rr-sig>
+        <rr-sig name="variants(generator, options, count?) → SVG path strings"></rr-sig>
+      </rr-types>
+    </rr-beat>
+    <rr-beat><p>The DOM layer owns lifecycle. The pure renderer owns seeded paths. CSS owns chalk palette, layer density, focus, state, and motion.</p></rr-beat>
+  </rr-slide>
+
+  <rr-slide spine="Route" title="Identity sets the names; one gate joins the work" kicker="EXECUTION">
+    <rr-dag id="chalk-dag" label="Build route" cols="5" min="120">
+      <rr-dag-node id="identity" col="1" row="1" tone="amber">Identity decision</rr-dag-node>
+      <rr-dag-node id="visual" col="2" row="1" tone="new">Renderer + CSS</rr-dag-node>
+      <rr-dag-node id="controls" col="3" row="1">Controls + React</rr-dag-node>
+      <rr-dag-node id="docs" col="3" row="2">Demo + docs</rr-dag-node>
+      <rr-dag-node id="gate" col="4" row="1" rows="2" tone="critical">Integration gate</rr-dag-node>
+      <rr-dag-node id="commit" col="5" row="1" rows="2" tone="green">Dogfood + commit</rr-dag-node>
+      <rr-dag-edge from="identity" to="visual" label="sets namespace"></rr-dag-edge>
+      <rr-dag-edge from="visual" to="controls" label="visual contract"></rr-dag-edge>
+      <rr-dag-edge from="visual" to="docs" label="visual contract"></rr-dag-edge>
+      <rr-dag-edge from="controls" to="gate" label="must pass"></rr-dag-edge>
+      <rr-dag-edge from="docs" to="gate" label="must agree"></rr-dag-edge>
+      <rr-dag-edge from="gate" to="commit" label="green only" tone="critical"></rr-dag-edge>
+    </rr-dag>
+    <rr-beat><p>No publish, deploy, production change, or push belongs to this phase.</p></rr-beat>
+  </rr-slide>
+
+  <rr-slide spine="Decide" title="Two choices set the first release" kicker="DECISIONS · 2">
+    <rr-callout tone="amber"><h3>1. Project identity</h3><p><b>Chalkably</b> creates a clean package and namespace, but needs a complete rename. <b>Drawably Chalk</b> is a smaller diff, but stays tied to the upstream identity.</p><p><b>Recommendation and default:</b> Chalkably. It is clear, playful, and publishable.</p></rr-callout>
+    <rr-beat>
+      <rr-callout tone="amber"><h3>2. Default surface</h3><p><b>Transparent chalk</b> fits any dark app. A <b>built-in board</b> guarantees contrast, but turns every control into a dark tile.</p><p><b>Recommendation and default:</b> transparent chalk. The library owns the mark; the host owns the page.</p></rr-callout>
+    </rr-beat>
+  </rr-slide>
+</rr-deck>
+</rr-doc>

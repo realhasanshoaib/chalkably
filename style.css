@@ -25,21 +25,21 @@
 .chalkably-stroke {
   stroke-dasharray: var(--chalkably-dash, none);
   stroke-dashoffset: var(--chalkably-offset, 0);
-  opacity: var(--chalkably-opacity, 0.9);
+  stroke-opacity: var(--chalkably-opacity, 0.9);
 }
 
 /* A chalk line is a dense mark, a broken powder pass, and a soft offset edge. */
 .chalkably-svg .chalkably-powder {
   stroke-width: calc(var(--chalkably-width, 2) * 0.76);
   stroke-dasharray: var(--chalkably-dash, none);
-  opacity: var(--chalkably-opacity, 0.26);
+  stroke-opacity: var(--chalkably-opacity, 0.26);
   filter: blur(0.24px);
 }
 
 .chalkably-svg .chalkably-edge {
   stroke-width: calc(var(--chalkably-width, 2) * 0.46);
   stroke-dasharray: var(--chalkably-dash, none);
-  opacity: var(--chalkably-opacity, 0.18);
+  stroke-opacity: var(--chalkably-opacity, 0.18);
   filter: blur(0.5px);
 }
 
@@ -137,6 +137,7 @@
   visibility: hidden;
   stroke-width: 1.5;
   stroke-dasharray: none;
+  stroke-opacity: 1;
   opacity: 1;
   filter: none;
 }
@@ -233,7 +234,7 @@
     animation: none;
   }
   .chalkably-boil[data-i="0"] {
-    opacity: var(--chalkably-opacity, 1);
+    opacity: 1;
   }
   .chalkably-svg .chalkably-check,
   .chalkably-svg .chalkably-dot,

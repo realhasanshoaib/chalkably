@@ -11,7 +11,11 @@ import {
   ChalkablyToggle,
 } from "../src/react.js";
 
-(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
+Object.defineProperty(globalThis, "IS_REACT_ACT_ENVIRONMENT", {
+  configurable: true,
+  value: true,
+  writable: true,
+});
 
 let host: HTMLDivElement;
 let root: Root;

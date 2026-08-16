@@ -12,3 +12,13 @@
 - Hasan approved the recommended defaults without a spec review: the project is Chalkably, and controls draw transparent chalk over a host-owned surface.
 - Renamed the GitHub fork from `hhushhas/drawably` to `hhushhas/chalkably`.
 - Moved the spec to in-progress and removed the settled decision cards.
+
+## 2026-08-16 — implementation and dogfood
+
+- Renamed the package, vanilla attachers, React components, CSS classes, custom properties, tests, docs, demo, and assets to Chalkably.
+- Added deterministic chalk texture as three SVG marks: a dense core, broken powder, and a faint offset edge. Fixed boil compositing so each visible frame keeps its layer opacity.
+- Installed the packed `chalkably@0.1.0` tarball into a clean consumer and loaded all seven vanilla exports plus seeded custom geometry.
+- Dogfooded all controls and states in Helium. Replaced local Markdown links that Helium blocked with in-demo navigation, then repeated the pass with no findings or console errors.
+- Verified the responsive demo at 390 × 844 with no horizontal overflow.
+- Captured and validated a 9.7-second H.264 Helium recording, uploaded it to Drive, enabled public access, and confirmed the anonymous link returns HTTP 200.
+- Passed the final gate: TypeScript check, 53 tests, build, package dry-run, SVG parsing, diff validation, complete namespace scan, and banned-assertion scan.

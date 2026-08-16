@@ -1,7 +1,7 @@
 # Chalkably v0.1
 
-Status: in progress  
-Owner: Hasan  
+Status: done
+Owner: Hasan
 Source: `hhushhas/chalkably`, forked from `Danilaa1/drawably`
 
 ## Background

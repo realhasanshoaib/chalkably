@@ -21,7 +21,7 @@ function mountButton(opts = {}) {
 
 describe("chalkablyButton", () => {
   it("throws on a null element", () => {
-    expect(() => chalkablyButton(null as unknown as HTMLElement)).toThrow();
+    expect(() => Reflect.apply(chalkablyButton, undefined, [null])).toThrow();
   });
 
   it("injects an aria-hidden svg with 3 boil variants per layer", () => {

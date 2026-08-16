@@ -5,22 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Chalkably — accessible UI controls with warm chalk SVG chrome."
+      content="Chalkably Cosmic Chalk — accessible UI controls drawn on a midnight board."
     />
-    <title>Chalkably — chalk-drawn UI controls</title>
+    <title>Chalkably — Cosmic Chalk controls</title>
     <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../themes/cosmic.css" />
     <style>
       :root {
-        --board: #17232d;
-        --board-deep: #111b24;
-        --chalk: #f3eee2;
-        --chalk-dim: #c8c6bd;
-        --chalk-faint: #8e9796;
-        --chalk-green: #91ddb4;
-        --chalk-red: #ff9a8f;
-        --chalk-yellow: #f3d38b;
-        --line: rgb(243 238 226 / 18%);
-        --panel: rgb(10 17 23 / 32%);
+        --board: #10182b;
+        --board-deep: #080f20;
+        --chalk: #f4ecd7;
+        --chalk-dim: #c8ccdb;
+        --chalk-faint: #aeb8c9;
+        --chalk-green: #93e6c0;
+        --chalk-red: #ff9ba8;
+        --chalk-yellow: #f5d88c;
+        --chalk-comet: #8fdcff;
+        --line: rgb(244 236 215 / 18%);
+        --panel: rgb(6 13 31 / 58%);
         --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
         --sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
         --chalkably-stroke: var(--chalk);
@@ -28,6 +30,7 @@
         --chalkably-paper: var(--board);
         --chalkably-error: var(--chalk-red);
         --chalkably-success: var(--chalk-green);
+        --chalkably-width: 2.25px;
       }
 
       * {
@@ -44,12 +47,32 @@
         min-width: 320px;
         margin: 0;
         background:
-          radial-gradient(circle at 12% 0%, rgb(62 84 93 / 20%), transparent 38rem),
-          radial-gradient(circle at 88% 20%, rgb(28 57 66 / 26%), transparent 34rem),
+          radial-gradient(circle at 14% -8%, rgb(79 139 190 / 18%), transparent 34rem),
+          radial-gradient(circle at 92% 18%, rgb(78 54 133 / 18%), transparent 38rem),
+          radial-gradient(circle at 50% 110%, rgb(30 65 116 / 18%), transparent 34rem),
           var(--board-deep);
         color: var(--chalk);
         font: 400 16px/1.55 var(--sans);
         letter-spacing: -0.01em;
+      }
+
+      body::before {
+        position: fixed;
+        z-index: 0;
+        inset: 0;
+        pointer-events: none;
+        content: "";
+        opacity: 0.48;
+        background-image:
+          radial-gradient(circle at 7% 15%, rgb(143 220 255 / 75%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 18% 48%, rgb(245 216 140 / 70%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 29% 11%, rgb(244 236 215 / 62%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 42% 72%, rgb(143 220 255 / 68%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 56% 28%, rgb(244 236 215 / 58%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 69% 12%, rgb(245 216 140 / 68%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 78% 66%, rgb(143 220 255 / 68%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 91% 35%, rgb(244 236 215 / 58%) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 84% 88%, rgb(245 216 140 / 58%) 0 1px, transparent 1.7px);
       }
 
       body::after {
@@ -58,7 +81,7 @@
         inset: 0;
         pointer-events: none;
         content: "";
-        opacity: 0.07;
+        opacity: 0.045;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.8'/%3E%3C/svg%3E");
         mix-blend-mode: screen;
       }
@@ -73,6 +96,8 @@
       }
 
       .page {
+        position: relative;
+        z-index: 1;
         width: min(1120px, calc(100% - 40px));
         margin: 0 auto;
         padding: 30px 0 84px;
@@ -102,7 +127,7 @@
         height: 9px;
         border-radius: 50%;
         background: var(--chalk-yellow);
-        box-shadow: 0 0 18px rgb(243 211 139 / 45%);
+        box-shadow: 0 0 16px rgb(245 216 140 / 46%);
       }
 
       .topbar a {
@@ -114,13 +139,27 @@
       }
 
       .hero {
+        position: relative;
         max-width: 780px;
         padding-bottom: 74px;
       }
 
+      .hero::after {
+        position: absolute;
+        top: 12px;
+        right: -84px;
+        width: 210px;
+        height: 72px;
+        border: 1px solid rgb(143 220 255 / 28%);
+        border-left-color: transparent;
+        border-radius: 50%;
+        content: "";
+        transform: rotate(-14deg);
+      }
+
       .eyebrow {
         margin: 0 0 17px;
-        color: var(--chalk-yellow);
+        color: var(--chalk-comet);
         font: 600 12px/1 var(--mono);
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -171,7 +210,8 @@
         border: 1px solid var(--line);
         border-radius: 22px;
         background:
-          linear-gradient(130deg, rgb(255 255 255 / 3%), transparent 32%),
+          radial-gradient(circle at 82% 4%, rgb(143 220 255 / 10%), transparent 19rem),
+          linear-gradient(130deg, rgb(255 255 255 / 4%), transparent 32%),
           var(--panel);
         box-shadow:
           0 24px 80px rgb(0 0 0 / 20%),
@@ -183,7 +223,7 @@
         position: absolute;
         pointer-events: none;
         content: "";
-        border: 1px solid rgb(243 238 226 / 8%);
+        border: 1px solid rgb(143 220 255 / 16%);
         border-radius: 50%;
         transform: rotate(-7deg);
       }
@@ -193,6 +233,7 @@
         height: 120px;
         top: -50px;
         right: -120px;
+        border-color: rgb(143 220 255 / 24%);
       }
 
       .board::after {
@@ -200,6 +241,7 @@
         height: 100px;
         bottom: -62px;
         left: -100px;
+        border-color: rgb(245 216 140 / 20%);
         transform: rotate(11deg);
       }
 
@@ -231,9 +273,9 @@
       .surface-note {
         flex: 0 0 auto;
         padding: 8px 10px;
-        border: 1px solid rgb(243 238 226 / 18%);
+        border: 1px solid rgb(143 220 255 / 32%);
         border-radius: 4px;
-        color: var(--chalk-dim);
+        color: var(--chalk-comet);
         font: 500 10px/1 var(--mono);
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -251,9 +293,9 @@
       .sample-card {
         min-width: 0;
         padding: clamp(18px, 3vw, 28px);
-        border: 1px solid rgb(243 238 226 / 12%);
+        border: 1px solid rgb(143 220 255 / 17%);
         border-radius: 12px;
-        background: rgb(14 24 32 / 42%);
+        background: rgb(9 18 42 / 56%);
       }
 
       .sample-card > h3,
@@ -418,9 +460,9 @@
       .usage-card {
         min-width: 0;
         padding: clamp(18px, 3vw, 26px);
-        border: 1px solid rgb(243 238 226 / 12%);
+        border: 1px solid rgb(143 220 255 / 17%);
         border-radius: 12px;
-        background: rgb(14 24 32 / 30%);
+        background: rgb(9 18 42 / 42%);
       }
 
       .usage-card h3 {
@@ -433,16 +475,16 @@
         overflow-x: auto;
         margin: 0;
         padding: 14px;
-        border: 1px solid rgb(243 238 226 / 10%);
+        border: 1px solid rgb(143 220 255 / 18%);
         border-radius: 6px;
-        background: rgb(7 13 18 / 36%);
+        background: rgb(4 9 23 / 62%);
         color: var(--chalk-dim);
         font: 12px/1.65 var(--mono);
         tab-size: 2;
       }
 
       code .key {
-        color: var(--chalk-yellow);
+        color: var(--chalk-comet);
       }
 
       code .name {
@@ -450,7 +492,7 @@
       }
 
       code .string {
-        color: var(--chalk-green);
+        color: var(--chalk-yellow);
       }
 
       code .comment {
@@ -482,6 +524,13 @@
 
         .hero {
           padding-bottom: 52px;
+        }
+
+        .hero::after {
+          right: 0;
+          width: 130px;
+          height: 52px;
+          opacity: 0.7;
         }
 
         .board-heading {
@@ -538,20 +587,21 @@
       }
     </style>
   </head>
-  <body>
+  <body data-chalkably-theme="cosmic">
     <main class="page">
       <nav class="topbar" aria-label="Primary">
-        <a class="mark" href="."><span class="mark-dot" aria-hidden="true"></span>Chalkably</a>
+        <a class="mark" href="."><span class="mark-dot" aria-hidden="true"></span>Chalkably / Cosmic Chalk</a>
         <a href="https://github.com/hhushhas/chalkably">View source ↗</a>
       </nav>
 
       <header class="hero">
-        <p class="eyebrow">A tiny UI kit / v0.1.0</p>
-        <h1>Interfaces with a little dust on them.</h1>
+        <p class="eyebrow">Cosmic Chalk / v0.1.0</p>
+        <h1>Interfaces drawn between the stars.</h1>
         <p class="hero-copy">
           Chalkably keeps controls semantic and practical, then gives them the
-          loose edge of a hand-marked board. Seven zero-runtime-dependency
-          attachers, seeded SVG geometry, and motion that knows when to stop.
+          loose edge of a hand-marked midnight board. Seven zero-runtime-
+          dependency attachers, seeded SVG geometry, and motion that knows when
+          to stop.
         </p>
         <div class="hero-links">
           <a href="#controls">Explore the controls ↓</a>
@@ -562,14 +612,14 @@
       <section class="board" id="controls" aria-labelledby="board-title">
         <div class="board-heading">
           <div>
-            <h2 id="board-title">The chalkboard</h2>
+            <h2 id="board-title">The midnight chalkboard</h2>
             <p>
-              Warm-white strokes stay transparent so your app can own the
-              surface. Hover, focus, and toggle each control to feel the sketch
-              settle under your hand.
+              Moon-white strokes stay transparent so your app can own the
+              surface. Hover, focus, and toggle each control to watch the
+              constellation settle under your hand.
             </p>
           </div>
-          <span class="surface-note">host surface / deep slate</span>
+          <span class="surface-note">host surface / midnight navy</span>
         </div>
 
         <div class="showcase-grid">
@@ -578,11 +628,11 @@
             <p>Every state is a real button. Loading keeps its place; error and success speak clearly.</p>
             <div class="button-grid">
               <div class="button-cell">
-                <button class="demo-button" id="btn-idle" type="button">Save changes</button>
+                <button class="demo-button" id="btn-idle" type="button">Save constellation</button>
                 <span class="state-label" data-state="idle">idle / solid</span>
               </div>
               <div class="button-cell">
-                <button class="demo-button" id="btn-loading" type="button">Syncing workspace…</button>
+                <button class="demo-button" id="btn-loading" type="button">Mapping star chart…</button>
                 <span class="state-label" data-state="loading">loading</span>
               </div>
               <div class="button-cell">
@@ -590,11 +640,11 @@
                 <span class="state-label" data-state="error">error</span>
               </div>
               <div class="button-cell">
-                <button class="demo-button" id="btn-success" type="button">Published</button>
+                <button class="demo-button" id="btn-success" type="button">Published to orbit</button>
                 <span class="state-label" data-state="success">success</span>
               </div>
               <div class="button-cell">
-                <button class="demo-button" id="btn-neutral" type="button">Preview draft</button>
+                <button class="demo-button" id="btn-neutral" type="button">Preview sketch</button>
                 <span class="state-label" data-state="neutral">neutral tone</span>
               </div>
               <div class="button-cell">
@@ -618,13 +668,13 @@
                 <span class="control-wrap" id="radio-a">
                   <input type="radio" name="theme" value="chalk" checked />
                 </span>
-                <span>Warm chalk</span>
+                <span>Warm moon chalk</span>
               </label>
               <label class="choice">
                 <span class="control-wrap" id="radio-b">
                   <input type="radio" name="theme" value="ice" />
                 </span>
-                <span>Cool chalk</span>
+                <span>Cool comet accent</span>
               </label>
               <label class="choice toggle-row">
                 <span class="toggle-copy">
@@ -655,7 +705,8 @@
               visual tests, let it redraw when a surface changes, or leave the
               defaults alone and accept a different little mark on every mount.
               The long copy here is intentional: readable text should still feel
-              calm when the surrounding edges are loose.
+              calm when the surrounding edges are loose and the sky is full of
+              quiet stars.
             </p>
           </article>
         </div>
@@ -665,6 +716,7 @@
             <h3>Vanilla</h3>
             <pre><code><span class="key">import</span> { <span class="name">chalkablyButton</span> } <span class="key">from</span> <span class="string">"chalkably"</span>;
 <span class="key">import</span> <span class="string">"chalkably/style.css"</span>;
+<span class="key">import</span> <span class="string">"chalkably/themes/cosmic.css"</span>;
 
 <span class="name">chalkablyButton</span>(button, {
   variant: <span class="string">"solid"</span>,

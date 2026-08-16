@@ -6,10 +6,10 @@ chrome while leaving the native element, keyboard behaviour, and accessibility
 semantics in place.
 
 The library is surface-agnostic: strokes are transparent over your surface by
-default. The example board uses a deep slate background so the warm-white chalk
-has room to breathe.
+default. The example board uses a midnight navy background so moon-white chalk
+and cool constellation accents have room to breathe.
 
-![Chalkably controls on a deep slate board](assets/demo.svg)
+![Chalkably Cosmic Chalk controls on a midnight navy board](assets/demo.svg)
 
 ## Install
 
@@ -107,6 +107,20 @@ loading button dims and boils faster; error and success use the theme colours.
 
 ## Options and theming
 
+The optional Cosmic Chalk theme gives the same controls a midnight-board
+palette: warm moon chalk, a cool comet focus accent, and restrained
+starlight state colors. It is transparent, so your host still owns the
+surface:
+
+```js
+import "chalkably/style.css";
+import "chalkably/themes/cosmic.css";
+```
+
+Add `data-chalkably-theme="cosmic"` (or the `chalkably-theme-cosmic` class) to
+the host that wraps your controls. The theme export is available at
+`chalkably/themes/cosmic.css`.
+
 All seven controls accept these drawing options:
 
 | Option | Default | Purpose |
@@ -131,6 +145,11 @@ start with `--chalkably-`:
   --chalkably-success: #91ddb4;
 }
 ```
+
+Cosmic Chalk also exposes these palette tokens for surrounding UI:
+`--chalkably-moon`, `--chalkably-comet`, `--chalkably-starlight`,
+`--chalkably-neutral`, `--chalkably-error`, `--chalkably-success`, and
+`--chalkably-paper`. Its intentional stroke width is `2.25px`.
 
 Chalkably does not add a background, font, or runtime dependency. Your host
 surface owns those decisions.

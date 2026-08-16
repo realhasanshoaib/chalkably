@@ -1,75 +1,85 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">Chalkably controls on a deep slate board</title>
-  <desc id="desc">Warm chalk outlines show buttons, a card, checkbox, radio, toggle, divider, and input.</desc>
+  <title id="title">Chalkably Cosmic Chalk demo</title>
+  <desc id="desc">A midnight navy Chalkably board showing button states and native controls in warm moon chalk with comet-blue constellation accents.</desc>
   <defs>
-    <filter id="chalk" x="-8%" y="-14%" width="116%" height="128%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="9" result="dust" />
+    <filter id="chalk" x="-8%" y="-12%" width="116%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="8" result="dust" />
       <feDisplacementMap in="SourceGraphic" in2="dust" scale="1.7" />
-      <feGaussianBlur stdDeviation="0.18" />
+      <feGaussianBlur stdDeviation=".18" />
     </filter>
     <pattern id="grain" width="90" height="90" patternUnits="userSpaceOnUse">
-      <circle cx="8" cy="20" r="1" fill="#f3eee2" opacity=".09" />
-      <circle cx="61" cy="42" r=".7" fill="#f3eee2" opacity=".07" />
-      <circle cx="33" cy="77" r=".8" fill="#f3eee2" opacity=".08" />
-      <path d="M4 61l9-1M77 8l5 1M50 13l4-.5" stroke="#f3eee2" stroke-width=".7" opacity=".05" />
+      <circle cx="8" cy="20" r="1" fill="#f4ecd7" opacity=".09" />
+      <circle cx="61" cy="42" r=".7" fill="#8fdcff" opacity=".08" />
+      <circle cx="33" cy="77" r=".8" fill="#f5d88c" opacity=".08" />
+      <path d="M4 61l9-1M77 8l5 1M50 13l4-.5" stroke="#f4ecd7" stroke-width=".7" opacity=".05" />
     </pattern>
     <style>
-      .chalk { fill: none; stroke: #f3eee2; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-      .soft { fill: none; stroke: #f3eee2; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: .42; }
-      .copy { fill: #c8c6bd; font: 400 17px system-ui, sans-serif; }
-      .label { fill: #8e9796; font: 600 12px ui-monospace, monospace; letter-spacing: 1.5px; text-transform: uppercase; }
-      .title { fill: #f3eee2; font: 600 54px system-ui, sans-serif; letter-spacing: -3px; }
+      .chalk { fill: none; stroke: #f4ecd7; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .soft { fill: none; stroke: #f4ecd7; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: .42; }
+      .comet { fill: none; stroke: #8fdcff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .56; }
+      .copy { fill: #c8ccdb; font: 400 17px system-ui, sans-serif; }
+      .label { fill: #aeb8c9; font: 600 12px ui-monospace, monospace; letter-spacing: 1.5px; text-transform: uppercase; }
+      .title { fill: #f4ecd7; font: 600 54px system-ui, sans-serif; letter-spacing: -3px; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" rx="28" fill="#17232d" />
+  <rect width="1200" height="720" rx="28" fill="#080f20" />
+  <rect width="1200" height="720" rx="28" fill="#10182b" />
   <rect width="1200" height="720" rx="28" fill="url(#grain)" />
+  <g aria-hidden="true" opacity=".65">
+    <circle cx="90" cy="90" r="1.6" fill="#8fdcff" />
+    <circle cx="192" cy="58" r="1.2" fill="#f5d88c" />
+    <circle cx="1060" cy="92" r="1.4" fill="#f4ecd7" />
+    <circle cx="1130" cy="198" r="1.2" fill="#8fdcff" />
+    <circle cx="1010" cy="640" r="1.5" fill="#f5d88c" />
+    <path d="M95 90L192 58L280 105M1010 640L1085 570L1130 505" class="comet" opacity=".38" />
+  </g>
   <path d="M74 82Q73 77 81 78H1119Q1125 78 1126 84" class="soft" opacity=".6" />
   <g filter="url(#chalk)">
-    <text x="76" y="156" class="label">A SMALL LIBRARY FOR HUMAN INTERFACES</text>
+    <text x="76" y="156" class="label" fill="#8fdcff">COSMIC CHALK / A SMALL LIBRARY FOR HUMAN INTERFACES</text>
     <text x="74" y="224" class="title">CHALKABLY</text>
-    <text x="77" y="264" class="copy">Real controls, loose edges, and a warm stroke that leaves your surface alone.</text>
+    <text x="77" y="264" class="copy">Real controls, loose edges, and moon-white marks on a midnight surface.</text>
 
     <path d="M76 323Q78 314 88 315H616Q625 316 624 327L621 612Q620 621 611 621H88Q77 620 78 611Z" class="chalk" />
     <path d="M84 317Q206 313 349 317T614 317M82 625Q240 620 393 625T616 624" class="soft" />
     <text x="110" y="367" class="label">BUTTON STATES</text>
 
-    <path d="M111 398Q112 392 119 393H294Q301 393 302 400L300 445Q299 451 292 451H119Q112 450 112 444Z" fill="#f3eee2" stroke="#f3eee2" stroke-width="3" />
-    <text x="145" y="429" fill="#17232d" font-family="system-ui,sans-serif" font-size="18" font-weight="600">Save changes</text>
+    <path d="M111 398Q112 392 119 393H294Q301 393 302 400L300 445Q299 451 292 451H119Q112 450 112 444Z" fill="#f4ecd7" stroke="#f4ecd7" stroke-width="3" />
+    <text x="132" y="429" fill="#10182b" font-family="system-ui,sans-serif" font-size="18" font-weight="600">Save constellation</text>
     <path d="M330 400Q330 394 337 394H510Q518 394 518 401L517 445Q517 451 509 451H336Q329 450 330 444Z" class="chalk" />
-    <text x="357" y="429" class="copy">Syncing workspace…</text>
-    <text x="533" y="422" class="label">LOADING</text>
+    <text x="350" y="429" class="copy">Mapping star chart…</text>
+    <text x="533" y="422" class="label" fill="#f5d88c">LOADING</text>
 
-    <path d="M111 476Q111 470 118 470H294Q302 470 302 477L300 522Q300 528 292 528H119Q112 528 112 521Z" class="chalk" />
-    <text x="152" y="506" class="copy">Try again</text>
-    <text x="236" y="548" class="label" fill="#ff9a8f">ERROR</text>
-    <path d="M330 477Q331 470 338 471H510Q518 471 518 478L517 521Q517 528 509 528H337Q329 527 330 520Z" fill="#f3eee2" stroke="#f3eee2" stroke-width="3" />
-    <text x="376" y="505" fill="#17232d" font-family="system-ui,sans-serif" font-size="18" font-weight="600">Published</text>
-    <text x="444" y="548" class="label" fill="#91ddb4">SUCCESS</text>
+    <path d="M111 476Q111 470 118 470H294Q302 470 302 477L300 522Q300 528 292 528H119Q112 528 112 521Z" class="chalk" stroke="#ff9ba8" />
+    <text x="152" y="506" class="copy" fill="#ff9ba8">Try again</text>
+    <text x="236" y="548" class="label" fill="#ff9ba8">ERROR</text>
+    <path d="M330 477Q331 470 338 471H510Q518 471 518 478L517 521Q517 528 509 528H337Q329 527 330 520Z" fill="#f4ecd7" stroke="#f4ecd7" stroke-width="3" />
+    <text x="365" y="505" fill="#10182b" font-family="system-ui,sans-serif" font-size="18" font-weight="600">Published to orbit</text>
+    <text x="444" y="548" class="label" fill="#93e6c0">SUCCESS</text>
 
-    <path d="M111 555Q111 549 118 549H294Q302 549 302 556L300 600Q300 606 292 606H119Q112 606 112 599Z" class="soft" />
-    <text x="139" y="583" class="copy">Preview draft</text>
+    <path d="M111 555Q111 549 118 549H294Q302 549 302 556L300 600Q300 606 292 606H119Q112 606 112 599Z" class="soft" stroke="#aeb8c9" />
+    <text x="139" y="583" class="copy">Preview sketch</text>
     <text x="130" y="618" class="label">NEUTRAL</text>
-    <path d="M330 555Q331 549 338 550H510Q518 550 518 557L517 600Q517 606 509 606H337Q329 605 330 598Z" class="chalk" stroke="#ff9a8f" />
-    <text x="378" y="583" class="copy" fill="#ff9a8f">Delete draft</text>
-    <text x="442" y="618" class="label" fill="#ff9a8f">DANGER</text>
+    <path d="M330 555Q331 549 338 550H510Q518 550 518 557L517 600Q517 606 509 606H337Q329 605 330 598Z" class="chalk" stroke="#ff9ba8" />
+    <text x="378" y="583" class="copy" fill="#ff9ba8">Delete draft</text>
+    <text x="442" y="618" class="label" fill="#ff9ba8">DANGER</text>
 
     <path d="M669 323Q671 314 681 315H1114Q1123 316 1122 326L1119 612Q1118 621 1109 621H681Q670 620 671 611Z" class="chalk" />
     <path d="M677 317Q793 313 916 317T1112 317M675 625Q826 620 953 625T1112 624" class="soft" />
-    <text x="704" y="367" class="label">NATIVE CONTROLS</text>
+    <text x="704" y="367" class="label" fill="#8fdcff">NATIVE CONTROLS</text>
     <rect x="707" y="393" width="22" height="22" rx="3" class="chalk" />
     <path d="M712 403l5 6 10-13" class="chalk" />
     <text x="750" y="410" class="copy">Keep me in the loop</text>
     <circle cx="718" cy="454" r="11" class="chalk" />
-    <circle cx="718" cy="454" r="4" fill="#f3eee2" />
-    <text x="750" y="460" class="copy">Warm chalk</text>
-    <circle cx="718" cy="495" r="11" class="chalk" />
-    <text x="750" y="501" class="copy">Cool chalk</text>
+    <circle cx="718" cy="454" r="4" fill="#f4ecd7" />
+    <text x="750" y="460" class="copy">Warm moon chalk</text>
+    <circle cx="718" cy="495" r="11" class="chalk" stroke="#8fdcff" />
+    <text x="750" y="501" class="copy">Cool comet accent</text>
     <path d="M706 533Q706 526 713 526H755Q762 526 762 533V542Q762 549 755 549H713Q706 549 706 542Z" class="chalk" />
-    <path d="M742 528Q749 528 751 537T742 547Q734 547 733 538T742 528Z" fill="#f3eee2" />
+    <path d="M742 528Q749 528 751 537T742 547Q734 547 733 538T742 528Z" fill="#8fdcff" />
     <text x="782" y="541" class="copy">Motion</text>
     <path d="M707 577Q708 570 715 570H1080Q1087 570 1087 577V603Q1086 609 1079 609H715Q707 608 708 602Z" class="chalk" />
     <text x="728" y="596" class="copy">North star / chalk studies</text>
-    <path d="M705 638Q829 635 953 638T1087 638" class="chalk" />
+    <path d="M705 638Q829 635 953 638T1087 638" class="comet" />
   </g>
 </svg>

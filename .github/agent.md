@@ -1,104 +1,79 @@
-# drawably
+# Chalkably agent guide
 
-Zero-dependency hand-drawn UI. Real HTML controls with SVG chrome. A unique seeded sketch per mount. Strokes boil in CSS.
+Chalkably is a zero-runtime-dependency UI library. It keeps real HTML controls
+in the DOM and draws warm chalk SVG chrome underneath them. The host owns the
+surface; the default stroke is transparent warm-white chalk.
 
-Install Inter yourself if you want the intended type. The library does not ship font files.
-
-```
-npm i drawably
-```
+The package is `chalkably` and the stylesheet is `chalkably/style.css`.
 
 ## Vanilla
 
 ```js
 import {
-  drawablyButton,
-  drawablyCheckbox,
-  drawablyRadio,
-  drawablyToggle,
-  drawablyInput,
-  drawablyDivider,
-  drawablyCard,
-} from "drawably";
-import "drawably/style.css";
+  chalkablyButton,
+  chalkablyCard,
+  chalkablyCheckbox,
+  chalkablyRadio,
+  chalkablyToggle,
+  chalkablyDivider,
+  chalkablyInput,
+} from "chalkably";
+import "chalkably/style.css";
 
-drawablyButton(document.querySelector("#done"), { variant: "solid" });
-drawablyCheckbox(document.querySelector("#check")); // wrapper must contain <input type="checkbox">
-drawablyRadio(document.querySelector("#pen")); // wrapper must contain <input type="radio">
-drawablyToggle(document.querySelector("#tog")); // wrapper must contain <input type="checkbox">
-drawablyInput(document.querySelector("#name")); // wrapper must contain <input>
-drawablyDivider(document.querySelector("#rule")); // <hr> or div
-drawablyCard(document.querySelector("#card"));
+chalkablyButton(document.querySelector("#done"), { variant: "solid" });
+chalkablyCard(document.querySelector("#card"));
+chalkablyCheckbox(document.querySelector("#check")); // wrapper contains an input
+chalkablyRadio(document.querySelector("#radio"));   // wrapper contains an input
+chalkablyToggle(document.querySelector("#toggle")); // wrapper contains an input
+chalkablyDivider(document.querySelector("#rule"));
+chalkablyInput(document.querySelector("#name"));    // wrapper contains an input
 ```
 
-Each attacher throws if the element is missing. Checkbox/radio/toggle/input throw if the inner `<input>` is missing. Returns a sketch: `{ resketch(seed?), destroy() }`. Buttons also have `setState(state)`.
+Each attacher throws when its required element is missing and returns a sketch
+with `{ resketch(seed?), destroy() }`. Buttons also expose
+`setState("idle" | "loading" | "error" | "success")`.
 
 ## React
 
-Optional peer. Subpath `"drawably/react"`. Client-only (uses `useEffect`).
+React is an optional peer dependency. The React subpath is client-only:
 
 ```jsx
 import {
-  DrawablyButton,
-  DrawablyCheckbox,
-  DrawablyRadio,
-  DrawablyToggle,
-  DrawablyInput,
-  DrawablyDivider,
-  DrawablyCard,
-} from "drawably/react";
-import "drawably/style.css";
+  ChalkablyButton,
+  ChalkablyCard,
+  ChalkablyCheckbox,
+  ChalkablyRadio,
+  ChalkablyToggle,
+  ChalkablyDivider,
+  ChalkablyInput,
+} from "chalkably/react";
+import "chalkably/style.css";
 
-<DrawablyButton variant="solid" state="idle" onClick={submit}>Done</DrawablyButton>
-<DrawablyButton tone="neutral">Cancel</DrawablyButton>
-<DrawablyButton tone="danger">Delete</DrawablyButton>
-<DrawablyCheckbox defaultChecked />
-<DrawablyRadio name="ink" defaultChecked />
-<DrawablyToggle />
-<DrawablyInput placeholder="your name" />
-<DrawablyDivider />
-<DrawablyCard>…</DrawablyCard>
+<ChalkablyButton variant="solid" state="idle">Done</ChalkablyButton>
+<ChalkablyButton tone="neutral">Cancel</ChalkablyButton>
+<ChalkablyButton tone="danger">Delete</ChalkablyButton>
+<ChalkablyCheckbox defaultChecked />
+<ChalkablyRadio name="choice" defaultChecked />
+<ChalkablyToggle />
+<ChalkablyInput placeholder="Your name" />
+<ChalkablyDivider />
+<ChalkablyCard>Content</ChalkablyCard>
 ```
 
-Native element props pass through. Sketch options are top-level props: `seed`, `roughness`, `boil`, `stroke`, `fill`, `paper`, `width`, plus button `variant`, `state`, and `tone`.
-
-## Button
-
-`drawablyButton(el, opts)` → `ButtonSketch`
-
-- `variant`: `"outline"` (default) | `"solid"` | `"scribble"`
-- `state`: `"idle"` | `"loading"` | `"error"` | `"success"`
-- `tone`: `"neutral"` (warm grey, secondary) | `"danger"` (red)
-- `setState(state)` after mount. React: `state` prop.
-- loading: dimmed, faster boil, `cursor: progress`
-- error: `--drawably-error` (default `#d12724`)
-- success: `--drawably-success` (default `#188a42`)
-
-## Other controls
-
-- `drawablyCheckbox(wrap, opts)` — checkbox in a wrapper
-- `drawablyRadio(wrap, opts)` — radio in a wrapper; scribbled dot when checked. Same `name` groups them.
-- `drawablyToggle(wrap, opts)` — checkbox in a wrapper; pill with a sliding ink-blob knob. React sets `role="switch"`.
-- `drawablyInput(wrap, opts)` — text input in a wrapper
-- `drawablyDivider(el, opts)` — rough line on an `<hr>` or div
-- `drawablyCard(el, opts)` — sketched container
-
-## Options (all controls)
-
-| option                          | default  | meaning                                                                     |
-| ------------------------------- | -------- | --------------------------------------------------------------------------- |
-| `seed`                          | random   | omit for a unique sketch per mount                                          |
-| `roughness`                     | `1`      | wobble of the base sketch                                                   |
-| `boil`                          | `0.3`    | frame-to-frame flicker in px; `0` = one static path                         |
-| `stroke` `fill` `paper` `width` | CSS vars | also `--drawably-stroke`, `--drawably-fill`, `--drawably-paper`, `--drawably-width` |
+Native props pass through. Drawing options are top-level props: `seed`,
+`roughness`, `boil`, `stroke`, `fill`, `paper`, and `width`; buttons also take
+`variant`, `state`, and `tone`.
 
 ## Rules
 
-- Do not fake the look with CSS borders. Attach to a real `button`, checkbox/radio wrapper, input wrapper, `hr`, or `div`.
-- Import `drawably/style.css` once. Do not restyle the SVG paths; theme with the custom properties.
-- Respect `prefers-reduced-motion`: the library already freezes boil and skips hover re-sketch. Do not add extra motion on top when that media query matches.
-- Hover/press re-sketches buttons, checkboxes, radios, and toggles.
-- Renderer exports if you need custom shapes: `roughRoundedRect`, `roughCircle`, `roughLine`, `roughCheckmark`, `scribbleFill`, `variants`, `mulberry32`, `randomSeed`.
-- No Vue/Svelte adapters. Vanilla or React.
+- Attach to a real button, control wrapper, input wrapper, `<hr>`, or block.
+- Import `chalkably/style.css` once. Theme with `--chalkably-*` custom properties;
+  do not restyle generated SVG paths.
+- Keep labels and native inputs present for keyboard and assistive technology.
+- Respect `prefers-reduced-motion`; Chalkably already freezes boil and skips
+  hover re-sketching in that mode.
+- Vanilla and React are supported. There are no Vue or Svelte adapters.
 
-MIT.
+The geometry exports (`roughRoundedRect`, `roughCircle`, `roughLine`,
+`roughCheckmark`, `scribbleFill`, `variants`, `mulberry32`, `randomSeed`) are
+stable and may be used for custom shapes.

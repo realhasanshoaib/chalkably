@@ -3,34 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>drawably — hand-drawn UI controls</title>
     <meta
       name="description"
-      content="Hand-drawn UI controls. Every mount a fresh pen sketch. Zero dependencies."
+      content="Chalkably — accessible UI controls with warm chalk SVG chrome."
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
-    />
+    <title>Chalkably — chalk-drawn UI controls</title>
     <link rel="stylesheet" href="../style.css" />
     <style>
       :root {
-        --ink: #18181b;
-        --ink-2: #474645;
-        --ink-3: #a1a1aa;
-        --pen: #2724d1;
-        --paper: #e3e3e1;
-        --code-k: #2724d1;
-        --code-s: #0f766e;
-        --code-n: #18181b;
-        --code-o: #b45309;
-        --code-p: #71717a;
-        --ease: cubic-bezier(0.2, 0, 0, 1);
-        --drawably-stroke: #2724d1;
-        --drawably-fill: #2724d1;
-        --drawably-paper: #e3e3e1;
+        --board: #17232d;
+        --board-deep: #111b24;
+        --chalk: #f3eee2;
+        --chalk-dim: #c8c6bd;
+        --chalk-faint: #8e9796;
+        --chalk-green: #91ddb4;
+        --chalk-red: #ff9a8f;
+        --chalk-yellow: #f3d38b;
+        --line: rgb(243 238 226 / 18%);
+        --panel: rgb(10 17 23 / 32%);
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        --sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        --chalkably-stroke: var(--chalk);
+        --chalkably-fill: var(--chalk);
+        --chalkably-paper: var(--board);
+        --chalkably-error: var(--chalk-red);
+        --chalkably-success: var(--chalk-green);
       }
 
       * {
@@ -38,980 +35,688 @@
       }
 
       html {
-        -webkit-font-smoothing: antialiased;
-        text-rendering: optimizeLegibility;
-        scrollbar-width: thin;
-        scrollbar-color: gray transparent;
-      }
-
-      * {
-        scrollbar-width: thin;
-        scrollbar-color: gray transparent;
-      }
-
-      @media (prefers-reduced-motion: no-preference) {
-        html {
-          scroll-behavior: smooth;
-        }
+        background: var(--board-deep);
+        color-scheme: dark;
+        scroll-behavior: smooth;
       }
 
       body {
+        min-width: 320px;
         margin: 0;
-        background: var(--paper);
-        color: var(--ink);
-        font:
-          400 15px/1.5 Inter,
-          ui-sans-serif,
-          system-ui,
-          sans-serif;
+        background:
+          radial-gradient(circle at 12% 0%, rgb(62 84 93 / 20%), transparent 38rem),
+          radial-gradient(circle at 88% 20%, rgb(28 57 66 / 26%), transparent 34rem),
+          var(--board-deep);
+        color: var(--chalk);
+        font: 400 16px/1.55 var(--sans);
         letter-spacing: -0.01em;
       }
 
       body::after {
-        content: "";
         position: fixed;
+        z-index: 20;
         inset: 0;
         pointer-events: none;
-        opacity: 0.035;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+        content: "";
+        opacity: 0.07;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.8'/%3E%3C/svg%3E");
+        mix-blend-mode: screen;
       }
 
-      .toc {
-        display: none;
+      a {
+        color: inherit;
       }
 
-      .toc ol {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        counter-reset: toc;
+      button,
+      input {
+        font: inherit;
       }
 
-      .toc li {
-        counter-increment: toc;
+      .page {
+        width: min(1120px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 30px 0 84px;
       }
 
-      .toc a {
+      .topbar {
         display: flex;
         align-items: center;
-        min-height: 40px;
-        color: var(--ink-3);
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 160ms var(--ease);
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 76px;
+        color: var(--chalk-faint);
+        font: 600 11px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
-      .toc a::before {
-        content: counter(toc) ".";
-        width: 1.4em;
-        flex-shrink: 0;
-        font-variant-numeric: tabular-nums;
-      }
-
-      .toc a:hover,
-      .toc a[aria-current="true"] {
-        color: var(--ink);
-      }
-
-      .toc a:focus-visible {
-        outline: 1.5px solid var(--pen);
-        outline-offset: 2px;
-      }
-
-      .agent {
-        position: absolute;
-        top: 14px;
-        right: 16px;
-        z-index: 3;
+      .mark {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        min-height: 40px;
-        padding: 0 8px;
-        border: 0;
-        background: none;
-        font:
-          500 11px/1 Geist Mono,
-          ui-monospace,
-          monospace;
-        color: var(--ink-3);
-        cursor: pointer;
-        letter-spacing: 0;
-        transition:
-          color 160ms var(--ease),
-          transform 120ms var(--ease);
+        gap: 10px;
+        color: var(--chalk);
       }
 
-      .agent:hover {
-        color: var(--ink);
+      .mark-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--chalk-yellow);
+        box-shadow: 0 0 18px rgb(243 211 139 / 45%);
       }
 
-      .agent:active {
-        transform: scale(0.96);
+      .topbar a {
+        text-decoration: none;
       }
 
-      .agent:focus-visible {
-        outline: 1.5px solid var(--pen);
-        outline-offset: 2px;
+      .topbar a:hover {
+        color: var(--chalk);
       }
 
-      .agent .cmd-icons {
-        width: 12px;
-        height: 12px;
+      .hero {
+        max-width: 780px;
+        padding-bottom: 74px;
       }
 
-      .agent .cmd-icons svg {
-        width: 12px;
-        height: 12px;
-        stroke: currentColor;
+      .eyebrow {
+        margin: 0 0 17px;
+        color: var(--chalk-yellow);
+        font: 600 12px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
-      .hero,
-      .board {
-        position: relative;
-        min-height: 100dvh;
-        overflow: clip;
-      }
-
-      .board {
-        scroll-margin-top: 0;
-      }
-
-      .brand {
-        position: absolute;
-        inset: 0;
-        display: grid;
-        place-content: center;
-        text-align: center;
-        padding: 24px;
-        pointer-events: none;
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
       }
 
       h1 {
-        margin: 0;
-        font-size: clamp(48px, 8vw, 88px);
+        max-width: 720px;
+        margin-bottom: 22px;
+        font-size: clamp(48px, 8vw, 92px);
         font-weight: 600;
-        letter-spacing: -0.04em;
-        line-height: 0.95;
+        letter-spacing: -0.075em;
+        line-height: 0.92;
         text-wrap: balance;
-        pointer-events: auto;
       }
 
-      .tagline {
-        margin: 14px auto 0;
-        max-width: 28ch;
-        color: var(--ink-2);
+      .hero-copy {
+        max-width: 62ch;
+        margin-bottom: 28px;
+        color: var(--chalk-dim);
+        font-size: clamp(17px, 2.1vw, 20px);
+        line-height: 1.48;
         text-wrap: pretty;
-        pointer-events: auto;
       }
 
-      .piece {
+      .hero-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        color: var(--chalk-dim);
+        font: 500 13px/1 var(--mono);
+      }
+
+      .hero-links a {
+        text-underline-offset: 4px;
+      }
+
+      .board {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(20px, 4vw, 46px);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background:
+          linear-gradient(130deg, rgb(255 255 255 / 3%), transparent 32%),
+          var(--panel);
+        box-shadow:
+          0 24px 80px rgb(0 0 0 / 20%),
+          inset 0 1px rgb(255 255 255 / 4%);
+      }
+
+      .board::before,
+      .board::after {
         position: absolute;
+        pointer-events: none;
+        content: "";
+        border: 1px solid rgb(243 238 226 / 8%);
+        border-radius: 50%;
+        transform: rotate(-7deg);
+      }
+
+      .board::before {
+        width: 340px;
+        height: 120px;
+        top: -50px;
+        right: -120px;
+      }
+
+      .board::after {
+        width: 260px;
+        height: 100px;
+        bottom: -62px;
+        left: -100px;
+        transform: rotate(11deg);
+      }
+
+      .board-heading {
+        position: relative;
         z-index: 1;
-      }
-
-      .piece-done {
-        top: 13%;
-        left: 11%;
-        rotate: -8deg;
-      }
-      .piece-cancel {
-        top: 18%;
-        right: 12%;
-        rotate: 6deg;
-      }
-      .piece-save {
-        top: 58%;
-        left: 8%;
-        rotate: 4deg;
-      }
-      .piece-check {
-        top: 46%;
-        right: 10%;
-        rotate: -5deg;
-      }
-      .piece-input {
-        bottom: 16%;
-        left: 14%;
-        rotate: -3deg;
-        width: 200px;
-      }
-      .piece-card {
-        bottom: 12%;
-        right: 11%;
-        rotate: 3deg;
-        width: min(220px, 42vw);
-      }
-      .piece-wait {
-        top: 8%;
-        left: 42%;
-        rotate: 4deg;
-      }
-      .piece-retry {
-        top: 36%;
-        right: 6%;
-        rotate: -7deg;
-      }
-      .piece-ok {
-        bottom: 7%;
-        left: 40%;
-        rotate: 5deg;
-      }
-      .piece-del {
-        top: 68%;
-        right: 7%;
-        rotate: 6deg;
-      }
-      .piece-radios {
-        top: 38%;
-        left: 6%;
-        rotate: -4deg;
         display: flex;
-        gap: 12px;
-        align-items: center;
-      }
-      .piece-toggle {
-        bottom: 30%;
-        right: 14%;
-        rotate: 3deg;
-      }
-      .piece-div {
-        top: 50%;
-        left: 28%;
-        rotate: -2deg;
-        width: 88px;
-        margin: 0;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 34px;
       }
 
-      .piece-mit {
-        top: 16%;
-        left: 18%;
-        rotate: -7deg;
-      }
-      .piece-ver {
-        top: 20%;
-        right: 14%;
-        rotate: 5deg;
-      }
-      .piece-react {
-        bottom: 14%;
-        right: 12%;
-        rotate: -4deg;
-        width: max-content;
-        max-width: min(280px, 70vw);
+      .board-heading h2 {
+        margin-bottom: 8px;
+        font-size: clamp(26px, 4vw, 42px);
+        font-weight: 600;
+        letter-spacing: -0.05em;
+        line-height: 1;
       }
 
-      .piece-fn-btn {
-        top: 14%;
-        left: 18%;
-        rotate: -6deg;
-      }
-      .piece-fn-check {
-        top: 18%;
-        right: 11%;
-        rotate: 5deg;
-      }
-      .piece-fn-input {
-        bottom: 20%;
-        left: 18%;
-        rotate: 4deg;
-      }
-      .piece-fn-card {
-        bottom: 16%;
-        right: 10%;
-        rotate: -5deg;
-      }
-      .piece-fn-radio {
-        top: 8%;
-        left: 40%;
-        rotate: 4deg;
-      }
-      .piece-fn-toggle {
-        bottom: 8%;
-        left: 38%;
-        rotate: -3deg;
-      }
-      .piece-fn-div {
-        top: 48%;
-        left: 8%;
-        rotate: 5deg;
-      }
-
-      .piece-input input {
-        width: 100%;
-        font: inherit;
-        color: var(--ink);
-      }
-
-      .piece-input input::placeholder {
-        color: var(--ink-3);
-      }
-
-      .check-label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-height: 40px;
-        color: var(--ink-2);
+      .board-heading p {
+        max-width: 48ch;
+        margin-bottom: 0;
+        color: var(--chalk-faint);
         font-size: 14px;
       }
 
-      .note,
-      .fn,
-      .meta {
-        margin: 0;
+      .surface-note {
+        flex: 0 0 auto;
+        padding: 8px 10px;
+        border: 1px solid rgb(243 238 226 / 18%);
+        border-radius: 4px;
+        color: var(--chalk-dim);
+        font: 500 10px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .showcase-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.85fr);
+        gap: 18px;
+      }
+
+      .sample-card {
+        min-width: 0;
+        padding: clamp(18px, 3vw, 28px);
+        border: 1px solid rgb(243 238 226 / 12%);
+        border-radius: 12px;
+        background: rgb(14 24 32 / 42%);
+      }
+
+      .sample-card > h3,
+      .sample-card > .card-title {
+        margin-bottom: 7px;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+      }
+
+      .sample-card > p,
+      .card-intro {
+        margin-bottom: 22px;
+        color: var(--chalk-faint);
         font-size: 13px;
-        line-height: 1.45;
-        color: var(--ink-2);
-        text-wrap: pretty;
       }
 
-      .fn,
-      .meta {
-        font-family:
-          Geist Mono,
-          ui-monospace,
-          monospace;
-        font-size: 12.5px;
+      .button-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
       }
 
-      .cmd-wrap {
-        pointer-events: auto;
-        width: max-content;
-        max-width: 82vw;
+      .button-cell {
+        display: grid;
+        align-content: start;
+        justify-items: start;
+        gap: 9px;
+        min-width: 0;
       }
 
-      #install-card.drawably-card {
-        padding: 6px 10px;
+      .button-cell .chalkably-button {
+        width: 100%;
+        min-height: 42px;
+        padding-inline: 12px;
+        white-space: normal;
       }
 
-      .code-wrap {
-        pointer-events: auto;
-        width: min(420px, 86vw);
-        text-align: left;
+      .state-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--chalk-faint);
+        font: 500 10px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
-      .cmd {
+      .state-label::before {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+        content: "";
+      }
+
+      .state-label[data-state="success"] {
+        color: var(--chalk-green);
+      }
+
+      .state-label[data-state="error"] {
+        color: var(--chalk-red);
+      }
+
+      .state-label[data-state="loading"] {
+        color: var(--chalk-yellow);
+      }
+
+      .control-stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .choice {
         display: flex;
         align-items: center;
-        gap: 8px;
-        width: 100%;
-        min-height: 40px;
-        padding: 0;
-        border: 0;
-        background: none;
-        box-shadow: none;
-        font:
-          500 13px/1 Geist Mono,
-          ui-monospace,
-          monospace;
-        color: var(--ink);
+        gap: 11px;
+        min-width: 0;
+        color: var(--chalk-dim);
+        font-size: 14px;
         cursor: pointer;
-        transition: transform 120ms var(--ease);
       }
 
-      .cmd:active {
-        transform: scale(0.96);
+      .choice:hover {
+        color: var(--chalk);
       }
 
-      .cmd:focus-visible {
-        outline: 1.5px solid var(--pen);
-        outline-offset: 2px;
-      }
-
-      .dollar {
-        color: var(--ink-3);
-      }
-      .cmd-text {
-        flex: 1;
-        text-align: left;
-      }
-
-      .cmd-icons {
+      .control-wrap {
         position: relative;
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0;
-        overflow: visible;
+        flex: 0 0 auto;
       }
 
-      .cmd-icons svg {
-        position: absolute;
-        inset: 0;
-        width: 16px;
-        height: 16px;
-        fill: none;
-        stroke: var(--pen);
-        stroke-width: 1.6;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        transform-origin: 50% 50%;
-        transition:
-          opacity 300ms var(--ease),
-          transform 300ms var(--ease),
-          filter 300ms var(--ease);
+      .toggle-row {
+        justify-content: space-between;
+        gap: 18px;
       }
 
-      .cmd-icons .copy {
-        opacity: 1;
-        transform: scale(1);
-        filter: blur(0);
+      .toggle-row .toggle-copy {
+        display: grid;
+        gap: 2px;
       }
 
-      .cmd-icons .tick {
-        opacity: 0;
-        transform: scale(0.25);
-        filter: blur(4px);
+      .toggle-copy small {
+        color: var(--chalk-faint);
+        font-size: 12px;
       }
 
-      .cmd[data-copied] .copy,
-      .agent[data-copied] .copy {
-        opacity: 0;
-        transform: scale(0.25);
-        filter: blur(4px);
+      .text-field {
+        display: grid;
+        gap: 7px;
+        color: var(--chalk-dim);
+        font-size: 13px;
       }
 
-      .cmd[data-copied] .tick,
-      .agent[data-copied] .tick {
-        opacity: 1;
-        transform: scale(1);
-        filter: blur(0);
+      .text-field > span {
+        font: 500 10px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .text-field input {
+        min-width: 0;
+        color: var(--chalk);
+      }
+
+      .rule-wrap {
+        display: grid;
+        gap: 10px;
+        margin: 4px 0;
+      }
+
+      .rule-wrap small {
+        color: var(--chalk-faint);
+        font: 500 10px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .long-card {
+        grid-column: 1 / -1;
+        padding: clamp(20px, 4vw, 32px);
+      }
+
+      .long-card p {
+        max-width: 70ch;
+        margin-bottom: 0;
+        color: var(--chalk-dim);
+      }
+
+      .long-card strong {
+        color: var(--chalk);
+        font-weight: 600;
+      }
+
+      .usage {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .usage-card {
+        min-width: 0;
+        padding: clamp(18px, 3vw, 26px);
+        border: 1px solid rgb(243 238 226 / 12%);
+        border-radius: 12px;
+        background: rgb(14 24 32 / 30%);
+      }
+
+      .usage-card h3 {
+        margin-bottom: 14px;
+        font-size: 16px;
+        font-weight: 600;
       }
 
       pre {
+        overflow-x: auto;
         margin: 0;
-        padding: 0;
-        overflow: hidden;
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        font:
-          400 12.5px/1.7 Geist Mono,
-          ui-monospace,
-          monospace;
-        text-align: left;
+        padding: 14px;
+        border: 1px solid rgb(243 238 226 / 10%);
+        border-radius: 6px;
+        background: rgb(7 13 18 / 36%);
+        color: var(--chalk-dim);
+        font: 12px/1.65 var(--mono);
+        tab-size: 2;
       }
 
-      .k {
-        color: var(--code-k);
-      }
-      .s {
-        color: var(--code-s);
-      }
-      .n {
-        color: var(--code-n);
-      }
-      .o {
-        color: var(--code-o);
-      }
-      .p {
-        color: var(--code-p);
+      code .key {
+        color: var(--chalk-yellow);
       }
 
-      @media (prefers-reduced-motion: no-preference) {
-        .brand,
-        .piece {
-          opacity: 0;
-          animation: enter 700ms var(--ease) forwards;
+      code .name {
+        color: var(--chalk);
+      }
+
+      code .string {
+        color: var(--chalk-green);
+      }
+
+      code .comment {
+        color: var(--chalk-faint);
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        margin-top: 34px;
+        color: var(--chalk-faint);
+        font: 500 11px/1.5 var(--mono);
+      }
+
+      .footer a {
+        text-underline-offset: 3px;
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          width: min(100% - 26px, 620px);
+          padding-top: 20px;
         }
-        .hero .brand {
-          animation-delay: 80ms;
+
+        .topbar {
+          padding-bottom: 56px;
         }
-        .piece-done {
-          animation-delay: 160ms;
+
+        .hero {
+          padding-bottom: 52px;
         }
-        .piece-cancel {
-          animation-delay: 240ms;
+
+        .board-heading {
+          display: block;
         }
-        .piece-save {
-          animation-delay: 320ms;
+
+        .surface-note {
+          display: inline-flex;
+          margin-top: 17px;
         }
-        .piece-check {
-          animation-delay: 400ms;
+
+        .showcase-grid,
+        .usage {
+          grid-template-columns: 1fr;
         }
-        .piece-input {
-          animation-delay: 480ms;
-        }
-        .piece-card {
-          animation-delay: 560ms;
-        }
-        .piece-wait {
-          animation-delay: 200ms;
-        }
-        .piece-retry {
-          animation-delay: 360ms;
-        }
-        .piece-ok {
-          animation-delay: 520ms;
+
+        .long-card {
+          grid-column: auto;
         }
       }
 
-      @keyframes enter {
-        from {
-          opacity: 0;
-          translate: 0 10px;
+      @media (max-width: 430px) {
+        .page {
+          width: min(100% - 20px, 620px);
         }
-        to {
-          opacity: 1;
-          translate: 0 0;
+
+        .topbar {
+          padding-bottom: 46px;
+          font-size: 10px;
+        }
+
+        h1 {
+          font-size: clamp(44px, 15vw, 66px);
+        }
+
+        .board {
+          padding: 16px;
+          border-radius: 16px;
+        }
+
+        .button-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .footer {
+          display: grid;
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .cmd-icons svg {
-          transition: none;
-        }
-        .toc li {
-          transition: none;
-          translate: none;
-        }
-      }
-
-      @media (min-width: 840px) {
-        .rest {
-          position: relative;
-        }
-        .toc {
-          display: block;
-          position: absolute;
-          left: 28px;
-          top: 50vh;
-          bottom: 0;
-          z-index: 2;
-          pointer-events: none;
-        }
-        .toc ol {
-          position: sticky;
-          top: 50%;
-          translate: 0 -50%;
-          pointer-events: none;
-        }
-        .toc li {
-          opacity: 0;
-          translate: 0 6px;
-          transition:
-            opacity 480ms var(--ease),
-            translate 480ms var(--ease);
-        }
-        .toc.is-in ol {
-          pointer-events: auto;
-        }
-        .toc.is-in li {
-          opacity: 1;
-          translate: 0 0;
-        }
-        .toc.is-in li:nth-child(1) {
-          transition-delay: 0ms;
-        }
-        .toc.is-in li:nth-child(2) {
-          transition-delay: 80ms;
-        }
-        .toc.is-in li:nth-child(3) {
-          transition-delay: 160ms;
-        }
-      }
-
-      @media (max-width: 720px) {
-        .hero,
-        .board {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 28px;
-          padding: 48px 20px 40px;
-        }
-        .brand {
-          position: static;
-          padding: 0;
-        }
-        .piece {
-          position: static;
-          rotate: 0deg;
-        }
-        .piece-input,
-        .piece-card,
-        .piece-react {
-          width: min(260px, 100%);
-        }
-        .scatter {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          align-items: center;
-          gap: 18px 22px;
+        html {
+          scroll-behavior: auto;
         }
       }
     </style>
   </head>
   <body>
-    <section class="hero" id="top" aria-label="drawably">
-      <button class="agent" id="agent" type="button" aria-label="Copy agent.md">
-        agent.md
-        <span class="cmd-icons" aria-hidden="true">
-          <svg class="copy" viewBox="0 0 16 16">
-            <rect x="5.5" y="5.5" width="8" height="8" rx="1.2" />
-            <path
-              d="M10.5 5.5V4.2A1.2 1.2 0 0 0 9.3 3H4.2A1.2 1.2 0 0 0 3 4.2v5.1A1.2 1.2 0 0 0 4.2 10.5H5.5"
-            />
-          </svg>
-          <svg class="tick" viewBox="0 0 16 16">
-            <path d="M3.5 8.5 6.5 11.5 12.5 4.5" />
-          </svg>
-        </span>
-      </button>
-      <div class="brand">
-        <h1>drawably</h1>
-        <p class="tagline">Hand-drawn UI. Fresh pen sketch every mount.</p>
-      </div>
-
-      <div class="scatter">
-        <div class="piece piece-done">
-          <button id="done" type="button">Done</button>
-        </div>
-        <div class="piece piece-cancel">
-          <button id="cancel" type="button">Cancel</button>
-        </div>
-        <div class="piece piece-save">
-          <button id="save" type="button">Save</button>
-        </div>
-        <div class="piece piece-wait">
-          <button id="wait" type="button">Wait</button>
-        </div>
-        <div class="piece piece-retry">
-          <button id="retry" type="button">Retry</button>
-        </div>
-        <div class="piece piece-ok">
-          <button id="ok" type="button">Saved</button>
-        </div>
-        <div class="piece piece-del">
-          <button id="del" type="button">Delete</button>
-        </div>
-        <div class="piece piece-radios">
-          <label class="check-label">
-            <span id="radio-a"><input type="radio" name="ink" checked /></span>
-            Pen
-          </label>
-          <label class="check-label">
-            <span id="radio-b"><input type="radio" name="ink" /></span>
-            Pencil
-          </label>
-        </div>
-        <div class="piece piece-toggle">
-          <label class="check-label">
-            <span id="tog"><input type="checkbox" /></span>
-          </label>
-        </div>
-        <hr class="piece piece-div" id="rule" />
-        <div class="piece piece-check">
-          <label class="check-label">
-            <span id="check"><input type="checkbox" checked /></span>
-            Ship it
-          </label>
-        </div>
-        <div class="piece piece-input" id="name">
-          <input type="text" placeholder="your name" autocomplete="name" />
-        </div>
-        <div class="piece piece-card" id="card">
-          <p class="note">Every stroke is generated at load. Hover a control to re-sketch.</p>
-        </div>
-      </div>
-    </section>
-
-    <div class="rest">
-      <nav class="toc" aria-label="On this page">
-        <ol>
-          <li><a href="#top">Drawably</a></li>
-          <li><a href="#install">Install</a></li>
-          <li><a href="#api">API</a></li>
-        </ol>
+    <main class="page">
+      <nav class="topbar" aria-label="Primary">
+        <a class="mark" href="."><span class="mark-dot" aria-hidden="true"></span>Chalkably</a>
+        <a href="https://github.com/hhushhas/chalkably">View source ↗</a>
       </nav>
 
-      <section class="board" id="install" aria-label="Install">
-        <div class="brand">
-          <div class="cmd-wrap" id="install-card">
-            <button class="cmd" id="copy" type="button" aria-label="Copy install command">
-              <span class="dollar">$</span>
-              <span class="cmd-text">npm i drawably</span>
-              <span class="cmd-icons" aria-hidden="true">
-                <svg class="copy" viewBox="0 0 16 16">
-                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.2" />
-                  <path
-                    d="M10.5 5.5V4.2A1.2 1.2 0 0 0 9.3 3H4.2A1.2 1.2 0 0 0 3 4.2v5.1A1.2 1.2 0 0 0 4.2 10.5H5.5"
-                  />
-                </svg>
-                <svg class="tick" viewBox="0 0 16 16">
-                  <path d="M3.5 8.5 6.5 11.5 12.5 4.5" />
-                </svg>
-              </span>
-            </button>
+      <header class="hero">
+        <p class="eyebrow">A tiny UI kit / v0.1.0</p>
+        <h1>Interfaces with a little dust on them.</h1>
+        <p class="hero-copy">
+          Chalkably keeps controls semantic and practical, then gives them the
+          loose edge of a hand-marked board. Seven zero-runtime-dependency
+          attachers, seeded SVG geometry, and motion that knows when to stop.
+        </p>
+        <div class="hero-links">
+          <a href="#controls">Explore the controls ↓</a>
+          <a href="../README.md">Read the guide ↗</a>
+        </div>
+      </header>
+
+      <section class="board" id="controls" aria-labelledby="board-title">
+        <div class="board-heading">
+          <div>
+            <h2 id="board-title">The chalkboard</h2>
+            <p>
+              Warm-white strokes stay transparent so your app can own the
+              surface. Hover, focus, and toggle each control to feel the sketch
+              settle under your hand.
+            </p>
           </div>
+          <span class="surface-note">host surface / deep slate</span>
         </div>
 
-        <div class="scatter">
-          <p class="piece piece-mit meta">MIT</p>
-          <p class="piece piece-ver meta">v0.1.0</p>
-          <div class="piece piece-react" id="react-card">
-            <pre><span class="k">import</span> <span class="p">{</span> <span class="n">DrawablyButton</span> <span class="p">}</span>
-<span class="k">from</span> <span class="s">"drawably/react"</span>
+        <div class="showcase-grid">
+          <article class="sample-card" id="button-card">
+            <h3>Button states</h3>
+            <p>Every state is a real button. Loading keeps its place; error and success speak clearly.</p>
+            <div class="button-grid">
+              <div class="button-cell">
+                <button class="demo-button" id="btn-idle" type="button">Save changes</button>
+                <span class="state-label" data-state="idle">idle / solid</span>
+              </div>
+              <div class="button-cell">
+                <button class="demo-button" id="btn-loading" type="button">Syncing workspace…</button>
+                <span class="state-label" data-state="loading">loading</span>
+              </div>
+              <div class="button-cell">
+                <button class="demo-button" id="btn-error" type="button">Try again</button>
+                <span class="state-label" data-state="error">error</span>
+              </div>
+              <div class="button-cell">
+                <button class="demo-button" id="btn-success" type="button">Published</button>
+                <span class="state-label" data-state="success">success</span>
+              </div>
+              <div class="button-cell">
+                <button class="demo-button" id="btn-neutral" type="button">Preview draft</button>
+                <span class="state-label" data-state="neutral">neutral tone</span>
+              </div>
+              <div class="button-cell">
+                <button class="demo-button" id="btn-danger" type="button">Delete draft</button>
+                <span class="state-label" data-state="danger">danger tone</span>
+              </div>
+            </div>
+          </article>
 
-<span class="p">&lt;</span><span class="n">DrawablyButton</span> <span class="o">state</span><span class="p">=</span><span class="s">"loading"</span><span class="p">&gt;</span></pre>
-          </div>
+          <article class="sample-card" id="input-card">
+            <h3>Native controls</h3>
+            <p>Labels and inputs stay ordinary, keyboard-friendly HTML.</p>
+            <div class="control-stack">
+              <label class="choice">
+                <span class="control-wrap" id="check-control">
+                  <input type="checkbox" checked />
+                </span>
+                <span>Keep me in the loop</span>
+              </label>
+              <label class="choice">
+                <span class="control-wrap" id="radio-a">
+                  <input type="radio" name="theme" value="chalk" checked />
+                </span>
+                <span>Warm chalk</span>
+              </label>
+              <label class="choice">
+                <span class="control-wrap" id="radio-b">
+                  <input type="radio" name="theme" value="ice" />
+                </span>
+                <span>Cool chalk</span>
+              </label>
+              <label class="choice toggle-row">
+                <span class="toggle-copy">
+                  <span>Motion</span>
+                  <small>Let the stroke gently boil</small>
+                </span>
+                <span class="control-wrap" id="toggle-control">
+                  <input type="checkbox" checked />
+                </span>
+              </label>
+              <label class="text-field" id="input-control">
+                <span>Workspace name</span>
+                <input type="text" value="North star / chalk studies" />
+              </label>
+              <div class="rule-wrap">
+                <small>chalkablyDivider</small>
+                <hr id="divider-control" />
+              </div>
+            </div>
+          </article>
+
+          <article class="sample-card long-card" id="brief-card">
+            <h3>Made for the parts people actually use</h3>
+            <p>
+              <strong>Chalkably is deliberately small.</strong> You get a button,
+              card, checkbox, radio, toggle, divider, and input — each backed by
+              native HTML and a decorative SVG sketch. Give it a stable seed for
+              visual tests, let it redraw when a surface changes, or leave the
+              defaults alone and accept a different little mark on every mount.
+              The long copy here is intentional: readable text should still feel
+              calm when the surrounding edges are loose.
+            </p>
+          </article>
+        </div>
+
+        <div class="usage">
+          <article class="usage-card" id="vanilla-card">
+            <h3>Vanilla</h3>
+            <pre><code><span class="key">import</span> { <span class="name">chalkablyButton</span> } <span class="key">from</span> <span class="string">"chalkably"</span>;
+<span class="key">import</span> <span class="string">"chalkably/style.css"</span>;
+
+<span class="name">chalkablyButton</span>(button, {
+  variant: <span class="string">"solid"</span>,
+  state: <span class="string">"success"</span>,
+});</code></pre>
+          </article>
+          <article class="usage-card" id="react-card">
+            <h3>React</h3>
+            <pre><code><span class="key">import</span> { <span class="name">ChalkablyButton</span> } <span class="key">from</span> <span class="string">"chalkably/react"</span>;
+
+&lt;<span class="name">ChalkablyButton</span>
+  variant={<span class="string">"solid"</span>}
+  state={saving ? <span class="string">"loading"</span> : <span class="string">"idle"</span>}
+&gt;Save changes&lt;/<span class="name">ChalkablyButton</span>&gt;</code></pre>
+          </article>
         </div>
       </section>
 
-      <section class="board" id="api" aria-label="API">
-        <div class="brand">
-          <div class="code-wrap" id="usage-card">
-            <pre><span class="k">import</span> <span class="p">{</span> <span class="n">drawablyButton</span> <span class="p">}</span> <span class="k">from</span> <span class="s">"drawably"</span><span class="p">;</span>
-<span class="k">import</span> <span class="s">"drawably/style.css"</span><span class="p">;</span>
-
-<span class="n">drawablyButton</span><span class="p">(</span><span class="o">done</span><span class="p">,</span> <span class="p">{</span> <span class="o">variant:</span> <span class="s">"solid"</span><span class="p">,</span> <span class="o">state:</span> <span class="s">"success"</span> <span class="p">});</span></pre>
-          </div>
-        </div>
-
-        <div class="scatter">
-          <div class="piece piece-fn-btn" id="fn-btn">
-            <p class="fn">
-              <span class="n">drawablyButton</span><span class="p">(</span><span class="o">el</span
-              ><span class="p">,</span> <span class="o">opts</span><span class="p">)</span>
-            </p>
-          </div>
-          <div class="piece piece-fn-check" id="fn-check">
-            <p class="fn">
-              <span class="n">drawablyCheckbox</span><span class="p">(</span
-              ><span class="o">wrap</span><span class="p">,</span> <span class="o">opts</span
-              ><span class="p">)</span>
-            </p>
-          </div>
-          <div class="piece piece-fn-input" id="fn-input">
-            <p class="fn">
-              <span class="n">drawablyInput</span><span class="p">(</span><span class="o">wrap</span
-              ><span class="p">,</span> <span class="o">opts</span><span class="p">)</span>
-            </p>
-          </div>
-          <div class="piece piece-fn-card" id="fn-card">
-            <p class="fn">
-              <span class="n">drawablyCard</span><span class="p">(</span><span class="o">el</span
-              ><span class="p">,</span> <span class="o">opts</span><span class="p">)</span>
-            </p>
-          </div>
-          <div class="piece piece-fn-radio" id="fn-radio">
-            <p class="fn">
-              <span class="n">drawablyRadio</span><span class="p">(</span><span class="o">wrap</span
-              ><span class="p">,</span> <span class="o">opts</span><span class="p">)</span>
-            </p>
-          </div>
-          <div class="piece piece-fn-toggle" id="fn-toggle">
-            <p class="fn">
-              <span class="n">drawablyToggle</span><span class="p">(</span><span class="o">wrap</span
-              ><span class="p">,</span> <span class="o">opts</span><span class="p">)</span>
-            </p>
-          </div>
-          <div class="piece piece-fn-div" id="fn-div">
-            <p class="fn">
-              <span class="n">drawablyDivider</span><span class="p">(</span><span class="o">el</span
-              ><span class="p">,</span> <span class="o">opts</span><span class="p">)</span>
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <script type="text/plain" id="agent-src">
-      # drawably
-
-      Zero-dependency hand-drawn UI. Real HTML controls with SVG chrome. A unique seeded sketch per mount. Strokes boil in CSS.
-
-      Install Inter yourself if you want the intended type. The library does not ship font files.
-
-      ```
-      npm i drawably
-      ```
-
-      ## Vanilla
-
-      ```js
-      import {
-        drawablyButton,
-        drawablyCheckbox,
-        drawablyRadio,
-        drawablyToggle,
-        drawablyInput,
-        drawablyDivider,
-        drawablyCard,
-      } from "drawably";
-      import "drawably/style.css";
-
-      drawablyButton(document.querySelector("#done"), { variant: "solid" });
-      drawablyCheckbox(document.querySelector("#check")); // wrapper must contain <input type="checkbox">
-      drawablyRadio(document.querySelector("#pen"));     // wrapper must contain <input type="radio">
-      drawablyToggle(document.querySelector("#tog"));    // wrapper must contain <input type="checkbox">
-      drawablyInput(document.querySelector("#name"));    // wrapper must contain <input>
-      drawablyDivider(document.querySelector("#rule"));  // <hr> or div
-      drawablyCard(document.querySelector("#card"));
-      ```
-
-      Each attacher throws if the element is missing. Checkbox/radio/toggle/input throw if the inner `<input>` is missing. Returns a sketch: `{ resketch(seed?), destroy() }`. Buttons also have `setState(state)`.
-
-      ## React
-
-      Optional peer. Subpath `"drawably/react"`. Client-only (uses `useEffect`).
-
-      ```jsx
-      import {
-        DrawablyButton,
-        DrawablyCheckbox,
-        DrawablyRadio,
-        DrawablyToggle,
-        DrawablyInput,
-        DrawablyDivider,
-        DrawablyCard,
-      } from "drawably/react";
-      import "drawably/style.css";
-
-      <DrawablyButton variant="solid" state="idle" onClick={submit}>Done</DrawablyButton>
-      <DrawablyButton tone="neutral">Cancel</DrawablyButton>
-      <DrawablyButton tone="danger">Delete</DrawablyButton>
-      <DrawablyCheckbox defaultChecked />
-      <DrawablyRadio name="ink" defaultChecked />
-      <DrawablyToggle />
-      <DrawablyInput placeholder="your name" />
-      <DrawablyDivider />
-      <DrawablyCard>…</DrawablyCard>
-      ```
-
-      Native element props pass through. Sketch options are top-level props: `seed`, `roughness`, `boil`, `stroke`, `fill`, `paper`, `width`, plus button `variant`, `state`, and `tone`.
-
-      ## Button
-
-      `drawablyButton(el, opts)` → `ButtonSketch`
-
-      - `variant`: `"outline"` (default) | `"solid"` | `"scribble"`
-      - `state`: `"idle"` | `"loading"` | `"error"` | `"success"`
-      - `tone`: `"neutral"` (warm grey, secondary) | `"danger"` (red)
-      - `setState(state)` after mount. React: `state` prop.
-      - loading: dimmed, faster boil, `cursor: progress`
-      - error: `--drawably-error` (default `#d12724`)
-      - success: `--drawably-success` (default `#188a42`)
-
-      ## Other controls
-
-      - `drawablyCheckbox(wrap, opts)` — checkbox in a wrapper
-      - `drawablyRadio(wrap, opts)` — radio in a wrapper; scribbled dot when checked. Same `name` groups them.
-      - `drawablyToggle(wrap, opts)` — checkbox in a wrapper; pill with a sliding ink-blob knob. React sets `role="switch"`.
-      - `drawablyInput(wrap, opts)` — text input in a wrapper
-      - `drawablyDivider(el, opts)` — rough line on an `<hr>` or div
-      - `drawablyCard(el, opts)` — sketched container
-
-      ## Options (all controls)
-
-      | option | default | meaning |
-      | --- | --- | --- |
-      | `seed` | random | omit for a unique sketch per mount |
-      | `roughness` | `1` | wobble of the base sketch |
-      | `boil` | `0.3` | frame-to-frame flicker in px; `0` = one static path |
-      | `stroke` `fill` `paper` `width` | CSS vars | also `--drawably-stroke`, `--drawably-fill`, `--drawably-paper`, `--drawably-width` |
-
-      ## Rules
-
-      - Do not fake the look with CSS borders. Attach to a real `button`, checkbox/radio wrapper, input wrapper, `hr`, or `div`.
-      - Import `drawably/style.css` once. Do not restyle the SVG paths; theme with the custom properties.
-      - Respect `prefers-reduced-motion`: the library already freezes boil and skips hover re-sketch. Do not add extra motion on top when that media query matches.
-      - Hover/press re-sketches buttons, checkboxes, radios, and toggles.
-      - Renderer exports if you need custom shapes: `roughRoundedRect`, `roughCircle`, `roughLine`, `roughCheckmark`, `scribbleFill`, `variants`, `mulberry32`, `randomSeed`.
-      - No Vue/Svelte adapters. Vanilla or React.
-
-      MIT.
-    </script>
+      <footer class="footer">
+        <span>Chalkably 0.1.0 · MIT · zero runtime dependencies</span>
+        <a href="../CHANGELOG.md">Changelog ↗</a>
+      </footer>
+    </main>
 
     <script type="module">
       import {
-        drawablyButton,
-        drawablyCard,
-        drawablyCheckbox,
-        drawablyDivider,
-        drawablyInput,
-        drawablyRadio,
-        drawablyToggle,
+        chalkablyButton,
+        chalkablyCard,
+        chalkablyCheckbox,
+        chalkablyDivider,
+        chalkablyInput,
+        chalkablyRadio,
+        chalkablyToggle,
       } from "../dist/index.js";
 
-      drawablyButton(document.getElementById("done"), { variant: "solid" });
-      drawablyButton(document.getElementById("cancel"), { tone: "neutral" });
-      drawablyButton(document.getElementById("save"), { variant: "scribble" });
-      drawablyButton(document.getElementById("wait"), { state: "loading" });
-      drawablyButton(document.getElementById("retry"), { variant: "outline", state: "error" });
-      drawablyButton(document.getElementById("ok"), { variant: "solid", state: "success" });
-      drawablyButton(document.getElementById("del"), { tone: "danger" });
-      drawablyCheckbox(document.getElementById("check"));
-      drawablyRadio(document.getElementById("radio-a"));
-      drawablyRadio(document.getElementById("radio-b"));
-      drawablyToggle(document.getElementById("tog"));
-      drawablyInput(document.getElementById("name"));
-      drawablyDivider(document.getElementById("rule"));
-      drawablyCard(document.getElementById("card"));
-      drawablyCard(document.getElementById("install-card"));
-      drawablyCard(document.getElementById("react-card"));
-      drawablyCard(document.getElementById("usage-card"));
-      drawablyCard(document.getElementById("fn-btn"));
-      drawablyCard(document.getElementById("fn-check"));
-      drawablyCard(document.getElementById("fn-input"));
-      drawablyCard(document.getElementById("fn-card"));
-      drawablyCard(document.getElementById("fn-radio"));
-      drawablyCard(document.getElementById("fn-toggle"));
-      drawablyCard(document.getElementById("fn-div"));
-
-      const copy = document.getElementById("copy");
-      copy.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText("npm i drawably");
-        } catch {
-          /* ponytail: clipboard may be blocked on file:// */
-        }
-        copy.dataset.copied = "";
-        window.setTimeout(() => delete copy.dataset.copied, 1400);
-      });
-
-      const agentBtn = document.getElementById("agent");
-      const agentSrc = document.getElementById("agent-src").textContent.trimStart();
-      agentBtn.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(agentSrc);
-        } catch {
-          /* ponytail: clipboard may be blocked on file:// */
-        }
-        agentBtn.dataset.copied = "";
-        window.setTimeout(() => delete agentBtn.dataset.copied, 1400);
-      });
-
-      const links = [...document.querySelectorAll(".toc a")];
-      const setCurrent = (id) => {
-        for (const a of links) {
-          if (a.hash === `#${id}`) a.setAttribute("aria-current", "true");
-          else a.removeAttribute("aria-current");
-        }
-      };
-      setCurrent("install");
-
-      const toc = document.querySelector(".toc");
-      const hero = document.getElementById("top");
-      new IntersectionObserver(
-        ([entry]) => {
-          toc.classList.toggle("is-in", !entry.isIntersecting);
-        },
-        { threshold: 0.05 },
-      ).observe(hero);
-
-      const spy = new IntersectionObserver(
-        (entries) => {
-          const hit = entries.find((e) => e.isIntersecting);
-          if (hit) setCurrent(hit.target.id);
-        },
-        { rootMargin: "-40% 0px -45% 0px" },
-      );
-      for (const a of links) {
-        const el = document.querySelector(a.hash);
-        if (el) spy.observe(el);
-      }
+      chalkablyButton(document.getElementById("btn-idle"), { variant: "solid" });
+      chalkablyButton(document.getElementById("btn-loading"), { state: "loading" });
+      chalkablyButton(document.getElementById("btn-error"), { state: "error" });
+      chalkablyButton(document.getElementById("btn-success"), { variant: "solid", state: "success" });
+      chalkablyButton(document.getElementById("btn-neutral"), { tone: "neutral" });
+      chalkablyButton(document.getElementById("btn-danger"), { tone: "danger" });
+      chalkablyCard(document.getElementById("button-card"));
+      chalkablyCard(document.getElementById("input-card"));
+      chalkablyCard(document.getElementById("brief-card"));
+      chalkablyCard(document.getElementById("vanilla-card"));
+      chalkablyCard(document.getElementById("react-card"));
+      chalkablyCheckbox(document.getElementById("check-control"));
+      chalkablyRadio(document.getElementById("radio-a"));
+      chalkablyRadio(document.getElementById("radio-b"));
+      chalkablyToggle(document.getElementById("toggle-control"));
+      chalkablyInput(document.getElementById("input-control"));
+      chalkablyDivider(document.getElementById("divider-control"));
     </script>
   </body>
 </html>

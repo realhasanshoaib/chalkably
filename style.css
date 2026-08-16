@@ -1,10 +1,10 @@
-.drawably-host {
+.chalkably-host {
   position: relative;
   isolation: isolate;
   font-family: Inter, system-ui, sans-serif;
 }
 
-.drawably-svg {
+.chalkably-svg {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -14,58 +14,76 @@
   z-index: -1;
 }
 
-.drawably-svg path {
+.chalkably-svg path {
   fill: none;
-  stroke: var(--drawably-ink, var(--drawably-stroke, #2724d1));
-  stroke-width: var(--drawably-width, 2);
+  stroke: var(--chalkably-ink, var(--chalkably-stroke, #f4f0e7));
+  stroke-width: var(--chalkably-width, 2);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* the three frames swap on shared keyframe percentages, so every hide and the
-   next show compute to the same instant — the delay-offset version left a
-   sub-ms gap where no frame was visible, sampling as a blank-frame flash */
-.drawably-boil {
+.chalkably-stroke {
+  stroke-dasharray: var(--chalkably-dash, none);
+  stroke-dashoffset: var(--chalkably-offset, 0);
+  opacity: var(--chalkably-opacity, 0.9);
+}
+
+/* A chalk line is a dense mark, a broken powder pass, and a soft offset edge. */
+.chalkably-svg .chalkably-powder {
+  stroke-width: calc(var(--chalkably-width, 2) * 0.76);
+  stroke-dasharray: var(--chalkably-dash, none);
+  opacity: var(--chalkably-opacity, 0.26);
+  filter: blur(0.24px);
+}
+
+.chalkably-svg .chalkably-edge {
+  stroke-width: calc(var(--chalkably-width, 2) * 0.46);
+  stroke-dasharray: var(--chalkably-dash, none);
+  opacity: var(--chalkably-opacity, 0.18);
+  filter: blur(0.5px);
+}
+
+.chalkably-boil {
   opacity: 0;
-  animation: drawably-boil-0 1200ms step-end infinite;
+  animation: chalkably-boil-0 1200ms step-end infinite;
 }
 
-.drawably-boil[data-i="1"] {
-  animation-name: drawably-boil-1;
+.chalkably-boil[data-i="1"] {
+  animation-name: chalkably-boil-1;
 }
 
-.drawably-boil[data-i="2"] {
-  animation-name: drawably-boil-2;
+.chalkably-boil[data-i="2"] {
+  animation-name: chalkably-boil-2;
 }
 
-@keyframes drawably-boil-0 {
+@keyframes chalkably-boil-0 {
   0% { opacity: 1; }
   33.33% { opacity: 0; }
 }
 
-@keyframes drawably-boil-1 {
+@keyframes chalkably-boil-1 {
   0% { opacity: 0; }
   33.33% { opacity: 1; }
   66.67% { opacity: 0; }
 }
 
-@keyframes drawably-boil-2 {
+@keyframes chalkably-boil-2 {
   0% { opacity: 0; }
   66.67% { opacity: 1; }
   100% { opacity: 0; }
 }
 
-.drawably-svg .drawably-blob {
-  fill: var(--drawably-ink, var(--drawably-fill, #2724d1));
-  stroke: var(--drawably-ink, var(--drawably-fill, #2724d1));
+.chalkably-svg .chalkably-blob {
+  fill: var(--chalkably-ink, var(--chalkably-fill, #f4f0e7));
+  stroke: var(--chalkably-ink, var(--chalkably-fill, #f4f0e7));
   stroke-width: 4;
 }
 
-.drawably-svg .drawably-scribble {
+.chalkably-svg .chalkably-scribble {
   stroke-width: 1.5;
 }
 
-.drawably-button {
+.chalkably-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -74,70 +92,73 @@
   background: none;
   font: inherit;
   font-family: Inter, system-ui, sans-serif;
-  color: var(--drawably-ink, var(--drawably-stroke, #2724d1));
+  color: var(--chalkably-ink, var(--chalkably-stroke, #f4f0e7));
   cursor: pointer;
   outline: none;
   transition: transform 120ms ease;
 }
 
-.drawably-button:active {
+.chalkably-button:active {
   transform: scale(0.92);
 }
 
-.drawably-button--neutral {
-  --drawably-stroke: #6e675f;
-  --drawably-fill: #6e675f;
+.chalkably-button--neutral {
+  --chalkably-stroke: #b5aaa0;
+  --chalkably-fill: #b5aaa0;
 }
 
-.drawably-button--danger {
-  --drawably-stroke: var(--drawably-error, #d12724);
-  --drawably-fill: var(--drawably-error, #d12724);
+.chalkably-button--danger {
+  --chalkably-stroke: var(--chalkably-error, #f08072);
+  --chalkably-fill: var(--chalkably-error, #f08072);
 }
 
-.drawably-button[data-state="error"] {
-  --drawably-ink: var(--drawably-error, #d12724);
+.chalkably-button[data-state="error"] {
+  --chalkably-ink: var(--chalkably-error, #f08072);
 }
 
-.drawably-button[data-state="success"] {
-  --drawably-ink: var(--drawably-success, #188a42);
+.chalkably-button[data-state="success"] {
+  --chalkably-ink: var(--chalkably-success, #86cf9a);
 }
 
-.drawably-button[data-state="loading"] {
+.chalkably-button[data-state="loading"] {
   cursor: progress;
   opacity: 0.6;
 }
 
-.drawably-button[data-state="loading"] .drawably-boil {
+.chalkably-button[data-state="loading"] .chalkably-boil {
   animation-duration: 450ms;
 }
 
-.drawably-button--solid {
-  color: var(--drawably-paper, #fff);
+.chalkably-button--solid {
+  color: var(--chalkably-paper, #17212b);
 }
 
-.drawably-svg .drawably-focus {
+.chalkably-svg .chalkably-focus {
   visibility: hidden;
   stroke-width: 1.5;
+  stroke-dasharray: none;
+  opacity: 1;
+  filter: none;
 }
 
-.drawably-host:is(:focus-visible, :has(:focus-visible)) .drawably-focus {
+.chalkably-host:is(:focus-visible, :has(:focus-visible)) .chalkably-focus {
   visibility: visible;
 }
 
-.drawably-checkbox,
-.drawably-radio {
+.chalkably-checkbox,
+.chalkably-radio {
   display: inline-block;
   width: 22px;
   height: 22px;
 }
 
-.drawably-toggle {
+.chalkably-toggle {
   display: inline-block;
   width: 44px;
   height: 24px;
 }
 
-:is(.drawably-checkbox, .drawably-radio, .drawably-toggle) input {
+:is(.chalkably-checkbox, .chalkably-radio, .chalkably-toggle) input {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -147,9 +168,9 @@
   cursor: pointer;
 }
 
-.drawably-svg .drawably-dot {
-  fill: var(--drawably-ink, var(--drawably-fill, #2724d1));
-  stroke: var(--drawably-ink, var(--drawably-fill, #2724d1));
+.chalkably-svg .chalkably-dot {
+  fill: var(--chalkably-ink, var(--chalkably-fill, #f4f0e7));
+  stroke: var(--chalkably-ink, var(--chalkably-fill, #f4f0e7));
   visibility: hidden;
   transform: scale(0.5);
   transform-box: fill-box;
@@ -157,42 +178,42 @@
   transition: transform 160ms ease-out;
 }
 
-.drawably-radio[data-checked] .drawably-dot {
+.chalkably-radio[data-checked] .chalkably-dot {
   visibility: visible;
   transform: scale(1);
 }
 
-.drawably-svg .drawably-knob {
+.chalkably-svg .chalkably-knob {
   transition: transform 160ms ease-out;
 }
 
 /* travel = toggle width 44px minus height 24px; resizing the toggle in CSS
    means overriding this too */
-.drawably-toggle[data-checked] .drawably-knob {
+.chalkably-toggle[data-checked] .chalkably-knob {
   transform: translateX(20px);
 }
 
-.drawably-divider {
+.chalkably-divider {
   display: block;
   height: 10px;
   border: 0;
 }
 
-.drawably-svg .drawably-check {
+.chalkably-svg .chalkably-check {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   transition: stroke-dashoffset 240ms ease-out;
 }
 
-.drawably-checkbox[data-checked] .drawably-check {
+.chalkably-checkbox[data-checked] .chalkably-check {
   stroke-dashoffset: 0;
 }
 
-.drawably-inputbox {
+.chalkably-inputbox {
   display: inline-block;
 }
 
-.drawably-inputbox input {
+.chalkably-inputbox input {
   border: 0;
   background: none;
   font: inherit;
@@ -203,20 +224,20 @@
   outline: none;
 }
 
-.drawably-card {
+.chalkably-card {
   padding: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drawably-boil {
+  .chalkably-boil {
     animation: none;
   }
-  .drawably-boil[data-i="0"] {
-    opacity: 1;
+  .chalkably-boil[data-i="0"] {
+    opacity: var(--chalkably-opacity, 1);
   }
-  .drawably-svg .drawably-check,
-  .drawably-svg .drawably-dot,
-  .drawably-svg .drawably-knob {
+  .chalkably-svg .chalkably-check,
+  .chalkably-svg .chalkably-dot,
+  .chalkably-svg .chalkably-knob {
     transition: none;
   }
 }

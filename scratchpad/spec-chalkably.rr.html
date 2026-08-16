@@ -1,6 +1,6 @@
 <rr-doc title="Chalkably v0.1" register="spec" project="drawably" risk="minor" summary="A faithful chalk translation of Drawably's seven accessible controls.">
 <rr-deck>
-  <rr-slide spine="Why" title="One small idea, redrawn in chalk" kicker="DRAFT · v0.1">
+  <rr-slide spine="Why" title="One small idea, redrawn in chalk" kicker="IN PROGRESS · v0.1">
     <p class="lede">Keep Drawably's tiny API, native controls, seeded SVG paths, and gentle boil. Change the material from pen ink to powdered chalk.</p>
     <rr-beat>
       <rr-panes>
@@ -78,10 +78,10 @@
     <rr-beat><p>No publish, deploy, production change, or push belongs to this phase.</p></rr-beat>
   </rr-slide>
 
-  <rr-slide spine="Decide" title="Two choices set the first release" kicker="DECISIONS · 2">
-    <rr-callout tone="amber"><h3>1. Project identity</h3><p><b>Chalkably</b> creates a clean package and namespace, but needs a complete rename. <b>Drawably Chalk</b> is a smaller diff, but stays tied to the upstream identity.</p><p><b>Recommendation and default:</b> Chalkably. It is clear, playful, and publishable.</p></rr-callout>
+  <rr-slide spine="Direction" title="The first-release direction is set" kicker="BUILD DEFAULTS">
+    <rr-callout tone="green"><h3>Chalkably</h3><p>The fork gets its own project, package, API, and CSS namespace while preserving the upstream MIT attribution.</p></rr-callout>
     <rr-beat>
-      <rr-callout tone="amber"><h3>2. Default surface</h3><p><b>Transparent chalk</b> fits any dark app. A <b>built-in board</b> guarantees contrast, but turns every control into a dark tile.</p><p><b>Recommendation and default:</b> transparent chalk. The library owns the mark; the host owns the page.</p></rr-callout>
+      <rr-callout tone="green"><h3>Transparent chalk</h3><p>The library owns the mark; the host owns the page. The demo supplies the deep slate board that shows the default chalk clearly.</p></rr-callout>
     </rr-beat>
   </rr-slide>
 </rr-deck>

@@ -1,8 +1,8 @@
 # Chalkably v0.1
 
-Status: draft  
+Status: in progress  
 Owner: Hasan  
-Source: `hhushhas/drawably`, forked from `Danilaa1/drawably`
+Source: `hhushhas/chalkably`, forked from `Danilaa1/drawably`
 
 ## Background
 
@@ -40,7 +40,7 @@ Controls keep the current state model. A loading control boils faster, error use
 
 ## Visual direction
 
-The default demo uses a deep slate board, warm white chalk, low-contrast board grain, and compact sans-serif type. Chalk color comes from CSS custom properties. Geometry stays loose but readable. Texture must not reduce the focus outline or make labels hard to read.
+The default demo uses a deep slate board, warm white chalk, low-contrast board grain, and compact sans-serif type. The controls themselves draw transparent chalk over the host surface. Chalk color comes from CSS custom properties. Geometry stays loose but readable. Texture must not reduce the focus outline or make labels hard to read.
 
 The visual signature comes from deterministic layered strokes, not from a background image or a new runtime dependency. The main line carries the shape. A lighter broken line creates powder gaps. A faint offset line softens the edge. The boil animation swaps complete seeded frames, as Drawably does today.
 
@@ -90,23 +90,3 @@ flowchart LR
 - Do not make boil faster or rougher until labels become tiring to read.
 - Do not remove Daniel Belyi's MIT attribution.
 - Do not publish to npm, deploy a site, touch production, or push the commit in this phase.
-
-## Open decisions
-
-### Project identity
-
-Choose whether the fork becomes **Chalkably** or keeps **Drawably** with a chalk edition label.
-
-- **Chalkably:** clear identity and publishable package name, but it requires a complete API and namespace migration.
-- **Drawably Chalk:** smallest code change, but the package identity remains tied to the upstream name and is harder to publish cleanly.
-
-Recommendation and default: **Chalkably**. It says what the library is, keeps the playful rhythm of Drawably, and gives the fork its own durable namespace.
-
-### Default surface
-
-Choose whether components bring a board surface or draw transparent chalk over the host app.
-
-- **Transparent chalk:** the library composes with any dark UI; the demo and card can provide board surfaces where needed.
-- **Built-in board:** the chalk effect is always legible, but every control becomes a dark tile and is harder to adopt.
-
-Recommendation and default: **transparent chalk**. The library should own the mark, while the host owns the page surface.

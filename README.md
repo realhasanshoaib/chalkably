@@ -1,138 +1,182 @@
-# drawably
+# Chalkably
 
-Hand-drawn UI controls. Every mount generates a fresh pen sketch from seeded
-randomness, and the stroke boils like an animated doodle. Zero dependencies,
-~4 KB of JS and one stylesheet.
+Chalkably is a tiny UI component library that makes real HTML controls feel
+like they were drawn in warm chalk. It adds seeded, lightly animated SVG
+chrome while leaving the native element, keyboard behaviour, and accessibility
+semantics in place.
 
-![Buttons, checkbox, radio and toggle drawn in a boiling pen stroke](assets/demo.svg)
+The library is surface-agnostic: strokes are transparent over your surface by
+default. The example board uses a midnight navy background so moon-white chalk
+and cool constellation accents have room to breathe.
+
+![Chalkably Cosmic Chalk controls on a midnight navy board](assets/demo.svg)
 
 ## Install
 
+The fork is currently an unpublished pre-release. From a local checkout:
+
 ```sh
-npm i drawably
+npm install /path/to/chalkably
 ```
 
-## Quick start
+When the package is published, the package name is `chalkably`:
+
+```sh
+npm install chalkably
+```
+
+## Vanilla quick start
+
+Import the CSS once, then attach a control to an existing element. The element
+stays real HTML; Chalkably adds an `aria-hidden` SVG underneath it.
 
 ```js
-import { drawablyButton } from "drawably";
-import "drawably/style.css";
+import { chalkablyButton } from "chalkably";
+import "chalkably/style.css";
 
-drawablyButton(document.querySelector("#done"), { variant: "solid" });
+const save = document.querySelector("#save");
+const sketch = chalkablyButton(save, { variant: "solid" });
+
+save.addEventListener("click", async () => {
+  sketch.setState("loading");
+  await saveDocument();
+  sketch.setState("success");
+});
 ```
 
-React:
+Every attacher returns a sketch handle:
+
+```js
+sketch.resketch();     // a fresh random seed
+sketch.resketch(42);   // a reproducible seed
+sketch.destroy();      // remove the SVG and listeners
+```
+
+## React
+
+React adapters are optional peer-only components. They are client-side
+components and pass native element props through to the underlying element.
 
 ```jsx
-import { DrawablyButton } from "drawably/react";
-import "drawably/style.css";
+import { ChalkablyButton, ChalkablyCard } from "chalkably/react";
+import "chalkably/style.css";
 
-<DrawablyButton variant="solid" onClick={submit}>Done</DrawablyButton>
-```
-
-Each attach call returns a sketch handle:
-
-```js
-const sketch = drawablyButton(el);
-sketch.resketch();     // redraw with a new random seed
-sketch.resketch(42);   // redraw with a specific seed
-sketch.destroy();      // remove the SVG and all listeners
-```
-
-## Buttons
-
-Three variants: `outline` (default), `solid`, `scribble`. Buttons also carry a
-state machine for async work:
-
-![The four button states: idle, loading, error, success](assets/states.svg)
-
-```js
-const button = drawablyButton(el);
-button.setState("loading");  // dims the button, boils faster
-button.setState("error");    // redraws in red
-button.setState("success");  // redraws in green
-button.setState("idle");
-```
-
-In React, pass the `state` prop; the sketch stays put and only the state
-changes:
-
-```jsx
-<DrawablyButton state={saving ? "loading" : "idle"}>Save</DrawablyButton>
-```
-
-Override the state colours with `--drawably-error` and `--drawably-success`.
-For secondary or destructive actions, set `tone: "neutral"` (warm grey) or
-`tone: "danger"` (red).
-
-## Controls
-
-| Function | Element it expects |
-| --- | --- |
-| `drawablyButton(el, opts)` | a `<button>` |
-| `drawablyCheckbox(el, opts)` | wrapper containing `<input type="checkbox">` |
-| `drawablyRadio(el, opts)` | wrapper containing `<input type="radio">` |
-| `drawablyToggle(el, opts)` | wrapper containing `<input type="checkbox">` |
-| `drawablyInput(el, opts)` | wrapper containing an `<input>` |
-| `drawablyDivider(el, opts)` | an `<hr>` or div |
-| `drawablyCard(el, opts)` | any block element |
-
-The real inputs stay in the DOM, so keyboard, forms, labels and screen readers
-all work as usual. The sketch is an `aria-hidden` SVG layered underneath.
-
-Every control has a React counterpart in `drawably/react`: `DrawablyButton`,
-`DrawablyCheckbox`, `DrawablyRadio`, `DrawablyToggle`, `DrawablyInput`,
-`DrawablyDivider`, `DrawablyCard`.
-
-## Options
-
-All controls take the same base options:
-
-| Option | Default | What it does |
-| --- | --- | --- |
-| `seed` | random | Omit for a unique sketch per mount, pass a number for a reproducible one |
-| `roughness` | `1` | Wobble of the base sketch |
-| `boil` | `0.3` | Px of frame-to-frame flicker; `0` renders one static path |
-| `stroke`, `fill`, `paper` | ink blue / white | Colours, set as `--drawably-*` custom properties |
-| `width` | `2` | Stroke width in px |
-
-The colours are plain CSS custom properties, so a theme can set them once:
-
-```css
-:root {
-  --drawably-stroke: #1a1a1a;
-  --drawably-fill: #1a1a1a;
+export function SavePanel({ saving }) {
+  return (
+    <ChalkablyCard>
+      <p>Draft changes are ready to share.</p>
+      <ChalkablyButton
+        variant="solid"
+        state={saving ? "loading" : "idle"}
+        onClick={saveDocument}
+      >
+        Save changes
+      </ChalkablyButton>
+    </ChalkablyCard>
+  );
 }
 ```
 
-Type is set in Inter when the page has it loaded (the library ships no font
-files — load Inter yourself), falling back to `system-ui`.
+## Controls
 
-## Motion
+| Vanilla function | React component | Element shape |
+| --- | --- | --- |
+| `chalkablyButton(el, opts)` | `ChalkablyButton` | a `<button>` |
+| `chalkablyCard(el, opts)` | `ChalkablyCard` | any block element |
+| `chalkablyCheckbox(wrap, opts)` | `ChalkablyCheckbox` | wrapper containing a checkbox input |
+| `chalkablyRadio(wrap, opts)` | `ChalkablyRadio` | wrapper containing a radio input |
+| `chalkablyToggle(wrap, opts)` | `ChalkablyToggle` | wrapper containing a checkbox input |
+| `chalkablyDivider(el, opts)` | `ChalkablyDivider` | an `<hr>` or div |
+| `chalkablyInput(wrap, opts)` | `ChalkablyInput` | wrapper containing an input |
 
-Strokes boil gently: three frames of the same sketch, micro-wobbled around a
-shared base, cycled by pure CSS at 1200ms. Hover or press re-sketches buttons
-and checkboxes. `prefers-reduced-motion` freezes everything to a single static
-sketch — including the demo images above.
+The input remains in the DOM, so labels, forms, focus, keyboard input, and
+screen readers continue to work. The SVG is decorative and `aria-hidden`.
 
-## Build your own shapes
+### Button states
 
-The rough renderer is exported. Each function returns an SVG path string, and
-`variants` produces the boil frames:
+Buttons support three visual variants:
+
+- `outline` (default), `solid`, and `scribble`
+- `idle`, `loading`, `error`, and `success` state values
+- `neutral` and `danger` tones for secondary or destructive actions
+
+Use `setState` on a vanilla sketch or pass `state` to a React component. A
+loading button dims and boils faster; error and success use the theme colours.
+
+![Idle, loading, error, success, neutral, and danger button states](assets/states.svg)
+
+## Options and theming
+
+The optional Cosmic Chalk theme gives the same controls a midnight-board
+palette: warm moon chalk, a cool comet focus accent, and restrained
+starlight state colors. It is transparent, so your host still owns the
+surface:
 
 ```js
-import { roughRoundedRect, roughLine, roughCircle, variants } from "drawably";
-
-const frames = variants(
-  (o) => roughRoundedRect(0, 0, 200, 100, 12, o),
-  { seed: 7, roughness: 1, boil: 0.3 },
-);
-// three path strings — render them and cycle opacity
+import "chalkably/style.css";
+import "chalkably/themes/cosmic.css";
 ```
 
-Also exported: `roughCheckmark`, `scribbleFill`, and the seeded PRNG
-`mulberry32`.
+Add `data-chalkably-theme="cosmic"` (or the `chalkably-theme-cosmic` class) to
+the host that wraps your controls. The theme export is available at
+`chalkably/themes/cosmic.css`.
+
+All seven controls accept these drawing options:
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `seed` | random | repeat a sketch by passing a number |
+| `roughness` | `1` | wobble of the base geometry |
+| `boil` | `0.3` | frame-to-frame flicker in px; `0` is static |
+| `stroke` | theme colour | chalk outline colour |
+| `fill` | theme colour | chalk fill colour for solid shapes |
+| `paper` | theme colour | text colour on solid shapes |
+| `width` | `2` | chalk stroke width in px |
+
+Set CSS custom properties on a board or on one control. The public names all
+start with `--chalkably-`:
+
+```css
+.chalkboard {
+  --chalkably-stroke: #f5f0e6;
+  --chalkably-fill: #f5f0e6;
+  --chalkably-paper: #17232d;
+  --chalkably-error: #ff9a8f;
+  --chalkably-success: #91ddb4;
+}
+```
+
+Cosmic Chalk also exposes these palette tokens for surrounding UI:
+`--chalkably-moon`, `--chalkably-comet`, `--chalkably-starlight`,
+`--chalkably-neutral`, `--chalkably-error`, `--chalkably-success`, and
+`--chalkably-paper`. Its intentional stroke width is `2.25px`.
+
+Chalkably does not add a background, font, or runtime dependency. Your host
+surface owns those decisions.
+
+## Motion and accessibility
+
+The sketch gently boils between seeded frames and interactive controls
+re-sketch on hover and press. `prefers-reduced-motion: reduce` freezes the
+sketch and skips those interaction redraws. Keep the native control and its
+label in the document; never replace it with a decorative imitation.
+
+## Custom geometry
+
+The rough geometry exports stay available for custom SVG work:
+`roughRoundedRect`, `roughLine`, `roughCircle`, `roughCheckmark`,
+`scribbleFill`, `variants`, and the seeded `mulberry32`/`randomSeed` helpers.
+
+```js
+import { roughRoundedRect, variants } from "chalkably";
+
+const frames = variants(
+  (options) => roughRoundedRect(0, 0, 200, 80, 12, options),
+  { seed: 7, roughness: 1, boil: 0.3 },
+);
+```
 
 ## License
 
-MIT.
+MIT. Chalkably preserves Daniel Belyi's original copyright and identifies
+subsequent modifications by Hasan Shoaib in the license file.

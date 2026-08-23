@@ -1,21 +1,26 @@
 {
-  "name": "drawably",
-  "version": "0.1.1",
-  "description": "Hand-drawn UI controls. Every render a fresh pen sketch, boiling like a doodle.",
+  "name": "chalkably",
+  "version": "0.1.0",
+  "description": "Chalk-drawn UI controls with animated, accessible SVG chrome.",
   "license": "MIT",
   "author": "Daniel Belyi",
+  "contributors": ["Hasan Shoaib (modifications)"],
   "files": [
     "dist",
     "examples",
+    "assets",
+    "themes",
     "style.css",
     "style.css.d.ts",
     "README.md",
+    "CHANGELOG.md",
     ".github/agent.md",
     "LICENSE"
   ],
   "type": "module",
   "sideEffects": [
-    "./style.css"
+    "./style.css",
+    "./themes/cosmic.css"
   ],
   "types": "./dist/index.d.ts",
   "exports": {
@@ -30,6 +35,10 @@
     "./style.css": {
       "types": "./style.css.d.ts",
       "default": "./style.css"
+    },
+    "./themes/cosmic.css": {
+      "types": "./themes/cosmic.css.d.ts",
+      "default": "./themes/cosmic.css"
     },
     "./agent.md": "./.github/agent.md"
   },

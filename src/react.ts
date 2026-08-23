@@ -6,21 +6,21 @@ import {
   useRef,
 } from "react";
 import {
-  type ButtonSketch,
-  type DrawablyButtonOptions,
-  type DrawablyOptions,
-  drawablyButton,
-  drawablyCard,
-  drawablyCheckbox,
-  drawablyDivider,
-  drawablyInput,
-  drawablyRadio,
-  drawablyToggle,
-  type Sketch,
+  type ChalkablyButtonSketch,
+  type ChalkablyButtonOptions,
+  type ChalkablyOptions,
+  chalkablyButton,
+  chalkablyCard,
+  chalkablyCheckbox,
+  chalkablyDivider,
+  chalkablyInput,
+  chalkablyRadio,
+  chalkablyToggle,
+  type SketchHandle,
 } from "./controls.js";
 
 function useSketch<T extends HTMLElement>(
-  attach: (el: T) => Sketch,
+  attach: (el: T) => SketchHandle,
   deps: readonly unknown[],
 ) {
   const ref = useRef<T>(null);
@@ -32,12 +32,12 @@ function useSketch<T extends HTMLElement>(
   return ref;
 }
 
-type ButtonProps = DrawablyButtonOptions & ComponentProps<"button">;
+type ButtonProps = ChalkablyButtonOptions & ComponentProps<"button">;
 
-export function DrawablyButton({ seed, roughness, boil, stroke, fill, paper, width, variant, state, tone, className, children, ...rest }: ButtonProps): ReactElement {
-  const sketchRef = useRef<ButtonSketch | null>(null);
+export function ChalkablyButton({ seed, roughness, boil, stroke, fill, paper, width, variant, state, tone, className, children, ...rest }: ButtonProps): ReactElement {
+  const sketchRef = useRef<ChalkablyButtonSketch | null>(null);
   const ref = useSketch<HTMLButtonElement>(
-    (el) => (sketchRef.current = drawablyButton(el, { seed, roughness, boil, stroke, fill, paper, width, variant, state, tone })),
+    (el) => (sketchRef.current = chalkablyButton(el, { seed, roughness, boil, stroke, fill, paper, width, variant, state, tone })),
     [seed, roughness, boil, stroke, fill, paper, width, variant, tone, className],
   );
   useEffect(() => {
@@ -46,57 +46,57 @@ export function DrawablyButton({ seed, roughness, boil, stroke, fill, paper, wid
   return createElement("button", { type: "button", ...rest, className, ref }, children);
 }
 
-type CheckboxProps = DrawablyOptions & ComponentProps<"input">;
+type CheckboxProps = ChalkablyOptions & ComponentProps<"input">;
 
-export function DrawablyCheckbox({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: CheckboxProps): ReactElement {
+export function ChalkablyCheckbox({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: CheckboxProps): ReactElement {
   const ref = useSketch<HTMLSpanElement>(
-    (el) => drawablyCheckbox(el, { seed, roughness, boil, stroke, fill, paper, width }),
+    (el) => chalkablyCheckbox(el, { seed, roughness, boil, stroke, fill, paper, width }),
     [seed, roughness, boil, stroke, fill, paper, width, className],
   );
   return createElement("span", { className, ref }, createElement("input", { ...rest, type: "checkbox" }));
 }
 
-type InputProps = DrawablyOptions & ComponentProps<"input">;
+type InputProps = ChalkablyOptions & ComponentProps<"input">;
 
-export function DrawablyInput({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: InputProps): ReactElement {
+export function ChalkablyInput({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: InputProps): ReactElement {
   const ref = useSketch<HTMLSpanElement>(
-    (el) => drawablyInput(el, { seed, roughness, boil, stroke, fill, paper, width }),
+    (el) => chalkablyInput(el, { seed, roughness, boil, stroke, fill, paper, width }),
     [seed, roughness, boil, stroke, fill, paper, width, className],
   );
   return createElement("span", { className, ref }, createElement("input", rest));
 }
 
-export function DrawablyRadio({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: InputProps): ReactElement {
+export function ChalkablyRadio({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: InputProps): ReactElement {
   const ref = useSketch<HTMLSpanElement>(
-    (el) => drawablyRadio(el, { seed, roughness, boil, stroke, fill, paper, width }),
+    (el) => chalkablyRadio(el, { seed, roughness, boil, stroke, fill, paper, width }),
     [seed, roughness, boil, stroke, fill, paper, width, className],
   );
   return createElement("span", { className, ref }, createElement("input", { ...rest, type: "radio" }));
 }
 
-export function DrawablyToggle({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: CheckboxProps): ReactElement {
+export function ChalkablyToggle({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: CheckboxProps): ReactElement {
   const ref = useSketch<HTMLSpanElement>(
-    (el) => drawablyToggle(el, { seed, roughness, boil, stroke, fill, paper, width }),
+    (el) => chalkablyToggle(el, { seed, roughness, boil, stroke, fill, paper, width }),
     [seed, roughness, boil, stroke, fill, paper, width, className],
   );
   return createElement("span", { className, ref }, createElement("input", { ...rest, type: "checkbox", role: "switch" }));
 }
 
-type DividerProps = DrawablyOptions & ComponentProps<"hr">;
+type DividerProps = ChalkablyOptions & ComponentProps<"hr">;
 
-export function DrawablyDivider({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: DividerProps): ReactElement {
+export function ChalkablyDivider({ seed, roughness, boil, stroke, fill, paper, width, className, ...rest }: DividerProps): ReactElement {
   const ref = useSketch<HTMLHRElement>(
-    (el) => drawablyDivider(el, { seed, roughness, boil, stroke, fill, paper, width }),
+    (el) => chalkablyDivider(el, { seed, roughness, boil, stroke, fill, paper, width }),
     [seed, roughness, boil, stroke, fill, paper, width, className],
   );
   return createElement("hr", { ...rest, className, ref });
 }
 
-type CardProps = DrawablyOptions & ComponentProps<"div">;
+type CardProps = ChalkablyOptions & ComponentProps<"div">;
 
-export function DrawablyCard({ seed, roughness, boil, stroke, fill, paper, width, className, children, ...rest }: CardProps): ReactElement {
+export function ChalkablyCard({ seed, roughness, boil, stroke, fill, paper, width, className, children, ...rest }: CardProps): ReactElement {
   const ref = useSketch<HTMLDivElement>(
-    (el) => drawablyCard(el, { seed, roughness, boil, stroke, fill, paper, width }),
+    (el) => chalkablyCard(el, { seed, roughness, boil, stroke, fill, paper, width }),
     [seed, roughness, boil, stroke, fill, paper, width, className],
   );
   return createElement("div", { ...rest, className, ref }, children);

@@ -1,27 +1,34 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { drawablyButton, drawablyCard } from "../src/controls.js";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { chalkablyButton, chalkablyCard } from "../src/controls.js";
 
 beforeEach(() => {
   document.body.innerHTML = "";
 });
 
+afterEach(() => {
+  if (originalMatchMedia) Object.defineProperty(globalThis, "matchMedia", originalMatchMedia);
+  originalMatchMedia = undefined;
+});
+
+let originalMatchMedia: PropertyDescriptor | undefined;
+
 function mountButton(opts = {}) {
   const el = document.createElement("button");
   el.textContent = "Done";
   document.body.append(el);
-  return { el, sketch: drawablyButton(el, opts) };
+  return { el, sketch: chalkablyButton(el, opts) };
 }
 
-describe("drawablyButton", () => {
+describe("chalkablyButton", () => {
   it("throws on a null element", () => {
-    expect(() => drawablyButton(null as unknown as HTMLElement)).toThrow();
+    expect(() => Reflect.apply(chalkablyButton, undefined, [null])).toThrow();
   });
 
   it("injects an aria-hidden svg with 3 boil variants per layer", () => {
     const { el } = mountButton({ seed: 1 });
-    const svg = el.querySelector("svg.drawably-svg");
+    const svg = el.querySelector("svg.chalkably-svg");
     expect(svg?.getAttribute("aria-hidden")).toBe("true");
-    const paths = el.querySelectorAll("path.drawably-boil.drawably-outline");
+    const paths = el.querySelectorAll("path.chalkably-boil.chalkably-outline");
     expect(paths).toHaveLength(3);
     expect(paths[0].dataset.i).toBe("0");
     expect(paths[2].dataset.i).toBe("2");
@@ -30,44 +37,77 @@ describe("drawablyButton", () => {
 
   it("boil 0 draws a single static path per layer", () => {
     const { el } = mountButton({ seed: 1, boil: 0 });
-    expect(el.querySelectorAll("path.drawably-outline")).toHaveLength(1);
-    expect(el.querySelectorAll("path.drawably-boil")).toHaveLength(0);
+    expect(el.querySelectorAll("path.chalkably-stroke.chalkably-outline")).toHaveLength(1);
+    expect(el.querySelectorAll("path.chalkably-boil")).toHaveLength(0);
+  });
+
+  it("adds seeded powder and edge marks with uneven dash density", () => {
+    const first = mountButton({ seed: 17 });
+    const firstMarks = [...first.el.querySelectorAll("path.chalkably-mark")].map((path) => ({
+      className: path.getAttribute("class"),
+      dash: path.style.getPropertyValue("--chalkably-dash"),
+      opacity: path.style.getPropertyValue("--chalkably-opacity"),
+      transform: path.getAttribute("transform"),
+    }));
+    const second = mountButton({ seed: 17 });
+    const secondMarks = [...second.el.querySelectorAll("path.chalkably-mark")].map((path) => ({
+      className: path.getAttribute("class"),
+      dash: path.style.getPropertyValue("--chalkably-dash"),
+      opacity: path.style.getPropertyValue("--chalkably-opacity"),
+      transform: path.getAttribute("transform"),
+    }));
+    expect(firstMarks).toEqual(secondMarks);
+    expect(firstMarks).toHaveLength(6);
+    expect(new Set(firstMarks.map(({ dash }) => dash)).size).toBeGreaterThan(1);
+    expect(firstMarks.some(({ className }) => className.includes("chalkably-powder"))).toBe(true);
+    expect(firstMarks.some(({ className }) => className.includes("chalkably-edge"))).toBe(true);
+  });
+
+  it("does not add pointer redraw listeners when motion is reduced", () => {
+    originalMatchMedia = Object.getOwnPropertyDescriptor(globalThis, "matchMedia");
+    Object.defineProperty(globalThis, "matchMedia", {
+      configurable: true,
+      value: () => ({ matches: true }),
+    });
+    const { el } = mountButton({ seed: 1 });
+    const first = el.querySelector("path.chalkably-stroke")?.getAttribute("d");
+    el.dispatchEvent(new Event("pointerenter"));
+    expect(el.querySelector("path.chalkably-stroke")?.getAttribute("d")).toBe(first);
   });
 
   it("draws a hand-drawn focus ring layer", () => {
     const { el } = mountButton({ seed: 1 });
-    expect(el.querySelectorAll("path.drawably-focus")).toHaveLength(3);
+    expect(el.querySelectorAll("path.chalkably-focus")).toHaveLength(3);
   });
 
   it("sets paper and width custom properties from options", () => {
     const { el } = mountButton({ paper: "#fff", width: 3 });
-    expect(el.style.getPropertyValue("--drawably-paper")).toBe("#fff");
-    expect(el.style.getPropertyValue("--drawably-width")).toBe("3");
+    expect(el.style.getPropertyValue("--chalkably-paper")).toBe("#fff");
+    expect(el.style.getPropertyValue("--chalkably-width")).toBe("3");
   });
 
   it("adds host and variant classes", () => {
     const { el } = mountButton({ seed: 1, variant: "solid" });
-    expect(el.classList.contains("drawably-host")).toBe(true);
-    expect(el.classList.contains("drawably-button")).toBe(true);
-    expect(el.classList.contains("drawably-button--solid")).toBe(true);
+    expect(el.classList.contains("chalkably-host")).toBe(true);
+    expect(el.classList.contains("chalkably-button")).toBe(true);
+    expect(el.classList.contains("chalkably-button--solid")).toBe(true);
   });
 
   it("solid variant adds a blob layer under the outline", () => {
     const { el } = mountButton({ seed: 1, variant: "solid" });
-    expect(el.querySelectorAll("path")).toHaveLength(9);
-    expect(el.querySelectorAll("path.drawably-blob")).toHaveLength(3);
-    expect(el.querySelectorAll("path.drawably-outline")).toHaveLength(3);
+    expect(el.querySelectorAll("path.chalkably-stroke.chalkably-blob")).toHaveLength(3);
+    expect(el.querySelectorAll("path.chalkably-stroke.chalkably-outline")).toHaveLength(3);
   });
 
   it("scribble variant adds a scribble layer", () => {
     const { el } = mountButton({ seed: 1, variant: "scribble" });
-    expect(el.querySelectorAll("path.drawably-scribble")).toHaveLength(3);
+    expect(el.querySelectorAll("path.chalkably-stroke.chalkably-scribble")).toHaveLength(3);
   });
 
   it("sets colour custom properties from options", () => {
     const { el } = mountButton({ stroke: "red", fill: "blue" });
-    expect(el.style.getPropertyValue("--drawably-stroke")).toBe("red");
-    expect(el.style.getPropertyValue("--drawably-fill")).toBe("blue");
+    expect(el.style.getPropertyValue("--chalkably-stroke")).toBe("red");
+    expect(el.style.getPropertyValue("--chalkably-fill")).toBe("blue");
   });
 
   it("resketch is deterministic per seed and changes the drawing", () => {
@@ -94,7 +134,7 @@ describe("drawablyButton", () => {
 
   it("tone adds a tone class", () => {
     const { el } = mountButton({ seed: 1, tone: "neutral" });
-    expect(el.classList.contains("drawably-button--neutral")).toBe(true);
+    expect(el.classList.contains("chalkably-button--neutral")).toBe(true);
   });
 
   it("state option and setState drive data-state", () => {
@@ -118,27 +158,27 @@ describe("drawablyButton", () => {
     const { el, sketch } = mountButton({ seed: 1 });
     sketch.destroy();
     expect(el.querySelector("svg")).toBeNull();
-    expect(el.classList.contains("drawably-host")).toBe(false);
+    expect(el.classList.contains("chalkably-host")).toBe(false);
     el.dispatchEvent(new Event("pointerenter"));
     expect(el.querySelector("svg")).toBeNull();
   });
 });
 
-describe("drawablyCard", () => {
+describe("chalkablyCard", () => {
   it("draws a single outline layer and ignores pointer events", () => {
     const el = document.createElement("div");
     document.body.append(el);
-    drawablyCard(el, { seed: 1 });
-    expect(el.querySelectorAll("path")).toHaveLength(3);
+    chalkablyCard(el, { seed: 1 });
+    expect(el.querySelectorAll("path.chalkably-stroke.chalkably-outline")).toHaveLength(3);
     const d1 = el.querySelector("path")?.getAttribute("d");
     el.dispatchEvent(new Event("pointerenter"));
     expect(el.querySelector("path")?.getAttribute("d")).toBe(d1);
   });
 });
 
-import { drawablyCheckbox, drawablyDivider, drawablyInput, drawablyRadio, drawablyToggle } from "../src/controls.js";
+import { chalkablyCheckbox, chalkablyDivider, chalkablyInput, chalkablyRadio, chalkablyToggle } from "../src/controls.js";
 
-describe("drawablyCheckbox", () => {
+describe("chalkablyCheckbox", () => {
   function mountCheckbox(checked = false) {
     const wrap = document.createElement("span");
     const input = document.createElement("input");
@@ -146,19 +186,19 @@ describe("drawablyCheckbox", () => {
     input.checked = checked;
     wrap.append(input);
     document.body.append(wrap);
-    return { wrap, input, sketch: drawablyCheckbox(wrap, { seed: 1 }) };
+    return { wrap, input, sketch: chalkablyCheckbox(wrap, { seed: 1 }) };
   }
 
   it("throws without an inner checkbox input", () => {
     const wrap = document.createElement("span");
     document.body.append(wrap);
-    expect(() => drawablyCheckbox(wrap)).toThrow();
+    expect(() => chalkablyCheckbox(wrap)).toThrow();
   });
 
   it("draws box outline plus a pathLength-normalised check layer", () => {
     const { wrap } = mountCheckbox();
-    expect(wrap.querySelectorAll("path.drawably-outline")).toHaveLength(3);
-    const checks = wrap.querySelectorAll("path.drawably-check");
+    expect(wrap.querySelectorAll("path.chalkably-stroke.chalkably-outline")).toHaveLength(3);
+    const checks = wrap.querySelectorAll("path.chalkably-check");
     expect(checks).toHaveLength(3);
     for (const p of checks) expect(p.getAttribute("pathLength")).toBe("1");
   });
@@ -195,7 +235,7 @@ describe("drawablyCheckbox", () => {
   });
 });
 
-describe("drawablyRadio", () => {
+describe("chalkablyRadio", () => {
   function mountRadio(name = "g") {
     const wrap = document.createElement("span");
     const input = document.createElement("input");
@@ -203,21 +243,21 @@ describe("drawablyRadio", () => {
     input.name = name;
     wrap.append(input);
     document.body.append(wrap);
-    return { wrap, input, sketch: drawablyRadio(wrap, { seed: 1 }) };
+    return { wrap, input, sketch: chalkablyRadio(wrap, { seed: 1 }) };
   }
 
   it("throws without an inner radio input", () => {
     const wrap = document.createElement("span");
     document.body.append(wrap);
-    expect(() => drawablyRadio(wrap)).toThrow();
+    expect(() => chalkablyRadio(wrap)).toThrow();
   });
 
   it("draws circle outline, dot and focus layers", () => {
     const { wrap } = mountRadio();
-    expect(wrap.classList.contains("drawably-radio")).toBe(true);
-    expect(wrap.querySelectorAll("path.drawably-outline")).toHaveLength(3);
-    expect(wrap.querySelectorAll("path.drawably-dot")).toHaveLength(3);
-    expect(wrap.querySelectorAll("path.drawably-focus")).toHaveLength(3);
+    expect(wrap.classList.contains("chalkably-radio")).toBe(true);
+    expect(wrap.querySelectorAll("path.chalkably-stroke.chalkably-outline")).toHaveLength(3);
+    expect(wrap.querySelectorAll("path.chalkably-dot")).toHaveLength(3);
+    expect(wrap.querySelectorAll("path.chalkably-focus")).toHaveLength(3);
   });
 
   it("syncs data-checked across a group via document change events", () => {
@@ -241,7 +281,7 @@ describe("drawablyRadio", () => {
   });
 });
 
-describe("drawablyToggle", () => {
+describe("chalkablyToggle", () => {
   function mountToggle(checked = false) {
     const wrap = document.createElement("span");
     const input = document.createElement("input");
@@ -249,15 +289,15 @@ describe("drawablyToggle", () => {
     input.checked = checked;
     wrap.append(input);
     document.body.append(wrap);
-    return { wrap, input, sketch: drawablyToggle(wrap, { seed: 1 }) };
+    return { wrap, input, sketch: chalkablyToggle(wrap, { seed: 1 }) };
   }
 
   it("draws pill outline, knob blob and focus layers", () => {
     const { wrap } = mountToggle();
-    expect(wrap.classList.contains("drawably-toggle")).toBe(true);
-    expect(wrap.querySelectorAll("path.drawably-outline")).toHaveLength(3);
-    expect(wrap.querySelectorAll("path.drawably-knob.drawably-blob")).toHaveLength(3);
-    expect(wrap.querySelectorAll("path.drawably-focus")).toHaveLength(3);
+    expect(wrap.classList.contains("chalkably-toggle")).toBe(true);
+    expect(wrap.querySelectorAll("path.chalkably-stroke.chalkably-outline")).toHaveLength(3);
+    expect(wrap.querySelectorAll("path.chalkably-knob.chalkably-blob")).toHaveLength(3);
+    expect(wrap.querySelectorAll("path.chalkably-focus")).toHaveLength(3);
   });
 
   it("mirrors checked state to data-checked", () => {
@@ -271,27 +311,27 @@ describe("drawablyToggle", () => {
   });
 });
 
-describe("drawablyDivider", () => {
+describe("chalkablyDivider", () => {
   it("draws a single line layer", () => {
     const el = document.createElement("hr");
     document.body.append(el);
-    drawablyDivider(el, { seed: 1 });
-    expect(el.classList.contains("drawably-divider")).toBe(true);
-    expect(el.querySelectorAll("path.drawably-boil.drawably-outline")).toHaveLength(3);
+    chalkablyDivider(el, { seed: 1 });
+    expect(el.classList.contains("chalkably-divider")).toBe(true);
+    expect(el.querySelectorAll("path.chalkably-boil.chalkably-outline")).toHaveLength(3);
   });
 });
 
-describe("drawablyInput", () => {
+describe("chalkablyInput", () => {
   it("throws without an inner input and draws one outline layer with one", () => {
     const bare = document.createElement("span");
     document.body.append(bare);
-    expect(() => drawablyInput(bare)).toThrow();
+    expect(() => chalkablyInput(bare)).toThrow();
     const wrap = document.createElement("span");
     wrap.append(document.createElement("input"));
     document.body.append(wrap);
-    drawablyInput(wrap, { seed: 1 });
-    expect(wrap.classList.contains("drawably-inputbox")).toBe(true);
-    expect(wrap.querySelectorAll("path.drawably-outline")).toHaveLength(3);
-    expect(wrap.querySelectorAll("path.drawably-focus")).toHaveLength(3);
+    chalkablyInput(wrap, { seed: 1 });
+    expect(wrap.classList.contains("chalkably-inputbox")).toBe(true);
+    expect(wrap.querySelectorAll("path.chalkably-stroke.chalkably-outline")).toHaveLength(3);
+    expect(wrap.querySelectorAll("path.chalkably-focus")).toHaveLength(3);
   });
 });

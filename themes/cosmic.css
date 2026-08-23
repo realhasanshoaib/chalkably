@@ -1,0 +1,46 @@
+/*
+ * Cosmic Chalk is a transparent token theme. The host still owns its
+ * background; this file only gives Chalkably marks a moon-and-starlight
+ * palette and a slightly confident stroke.
+ */
+:where([data-chalkably-theme="cosmic"], .chalkably-theme-cosmic) {
+  --chalkably-moon: #f4ecd7;
+  --chalkably-comet: #8fdcff;
+  --chalkably-starlight: #f5d88c;
+  --chalkably-neutral: #aeb8c9;
+  --chalkably-error: #ff9ba8;
+  --chalkably-success: #93e6c0;
+  --chalkably-paper: #10182b;
+
+  --chalkably-ink: var(--chalkably-moon);
+  --chalkably-stroke: var(--chalkably-moon);
+  --chalkably-fill: var(--chalkably-moon);
+  --chalkably-width: 2.25px;
+}
+
+:where([data-chalkably-theme="cosmic"], .chalkably-theme-cosmic)
+  .chalkably-button--neutral {
+  --chalkably-stroke: var(--chalkably-neutral);
+  --chalkably-fill: var(--chalkably-neutral);
+}
+
+:where([data-chalkably-theme="cosmic"], .chalkably-theme-cosmic)
+  .chalkably-button[data-state="loading"] {
+  --chalkably-ink: var(--chalkably-starlight);
+}
+
+:where([data-chalkably-theme="cosmic"], .chalkably-theme-cosmic)
+  .chalkably-button:focus-visible,
+:where([data-chalkably-theme="cosmic"], .chalkably-theme-cosmic)
+  :is(.chalkably-checkbox, .chalkably-radio, .chalkably-toggle, .chalkably-inputbox):has(:focus-visible) {
+  --chalkably-ink: var(--chalkably-comet);
+  outline: 2px dashed var(--chalkably-comet);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where([data-chalkably-theme="cosmic"], .chalkably-theme-cosmic)
+    .chalkably-button {
+    transition: none;
+  }
+}

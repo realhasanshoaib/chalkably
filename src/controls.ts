@@ -1,4 +1,5 @@
 import { randomSeed } from "./prng.js";
+import { chalkTexture } from "./chalk.js";
 import {
   type RoughOptions,
   roughCheckmark,
@@ -9,7 +10,7 @@ import {
   variants,
 } from "./rough.js";
 
-export interface DrawablyOptions {
+export interface ChalkablyOptions {
   seed?: number;
   roughness?: number;
   boil?: number;
@@ -19,7 +20,7 @@ export interface DrawablyOptions {
   width?: number;
 }
 
-export interface Sketch {
+export interface SketchHandle {
   resketch(seed?: number): void;
   destroy(): void;
 }
@@ -27,6 +28,7 @@ export interface Sketch {
 interface Layer {
   className: string;
   pathLength?: boolean;
+  texture?: boolean;
   gen(w: number, h: number, o: RoughOptions): string;
 }
 
@@ -36,18 +38,18 @@ const INSET = 3;
 function attachChrome(
   el: HTMLElement,
   layers: Layer[],
-  opts: DrawablyOptions,
+  opts: ChalkablyOptions,
   interactive: boolean,
-): Sketch {
-  if (!(el instanceof HTMLElement)) throw new Error("drawably: expected an HTMLElement");
-  el.classList.add("drawably-host");
-  if (opts.stroke) el.style.setProperty("--drawably-stroke", opts.stroke);
-  if (opts.fill) el.style.setProperty("--drawably-fill", opts.fill);
-  if (opts.paper) el.style.setProperty("--drawably-paper", opts.paper);
-  if (opts.width !== undefined) el.style.setProperty("--drawably-width", String(opts.width));
+): SketchHandle {
+  if (!(el instanceof HTMLElement)) throw new Error("chalkably: expected an HTMLElement");
+  el.classList.add("chalkably-host");
+  if (opts.stroke) el.style.setProperty("--chalkably-stroke", opts.stroke);
+  if (opts.fill) el.style.setProperty("--chalkably-fill", opts.fill);
+  if (opts.paper) el.style.setProperty("--chalkably-paper", opts.paper);
+  if (opts.width !== undefined) el.style.setProperty("--chalkably-width", String(opts.width));
 
   const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("class", "drawably-svg");
+  svg.setAttribute("class", "chalkably-svg");
   svg.setAttribute("aria-hidden", "true");
   el.prepend(svg);
 
@@ -60,15 +62,38 @@ function attachChrome(
     const h = el.offsetHeight || 36;
     svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
     svg.textContent = "";
-    for (const layer of layers) {
+    for (const [layerIndex, layer] of layers.entries()) {
       const ds = variants((o) => layer.gen(w, h, o), { seed, roughness, boil }, boil > 0 ? 3 : 1);
       ds.forEach((d, i) => {
-        const p = document.createElementNS(SVG_NS, "path");
-        p.setAttribute("d", d);
-        p.setAttribute("class", ds.length > 1 ? `drawably-boil ${layer.className}` : layer.className);
-        p.dataset.i = String(i);
-        if (layer.pathLength) p.setAttribute("pathLength", "1");
-        svg.append(p);
+        const texture = chalkTexture(seed, layerIndex, i);
+        const boilingClass = ds.length > 1 ? " chalkably-boil" : "";
+        const core = document.createElementNS(SVG_NS, "path");
+        core.setAttribute("d", d);
+        core.setAttribute("class", `chalkably-stroke ${layer.className}${boilingClass}`);
+        core.dataset.i = String(i);
+        core.dataset.chalkLayer = "core";
+        setTexture(core, texture, "core");
+        if (layer.pathLength) core.setAttribute("pathLength", "1");
+        svg.append(core);
+
+        if (layer.texture !== false) {
+          const powder = document.createElementNS(SVG_NS, "path");
+          powder.setAttribute("d", d);
+          powder.setAttribute("class", `chalkably-mark chalkably-powder${boilingClass}`);
+          powder.dataset.i = String(i);
+          powder.dataset.chalkLayer = "powder";
+          setTexture(powder, texture, "powder");
+          svg.append(powder);
+
+          const edge = document.createElementNS(SVG_NS, "path");
+          edge.setAttribute("d", d);
+          edge.setAttribute("class", `chalkably-mark chalkably-edge${boilingClass}`);
+          edge.dataset.i = String(i);
+          edge.dataset.chalkLayer = "edge";
+          setTexture(edge, texture, "edge");
+          edge.setAttribute("transform", `translate(${texture.edgeX} ${texture.edgeY})`);
+          svg.append(edge);
+        }
       });
     }
   }
@@ -98,9 +123,28 @@ function attachChrome(
       el.removeEventListener("pointerenter", onPointer);
       el.removeEventListener("pointerdown", onPointer);
       svg.remove();
-      el.classList.remove("drawably-host");
+      el.classList.remove("chalkably-host");
     },
   };
+}
+
+function setTexture(
+  path: SVGPathElement,
+  texture: ReturnType<typeof chalkTexture>,
+  layer: "core" | "powder" | "edge",
+): void {
+  let dash = texture.coreDash;
+  let opacity = texture.coreOpacity;
+  if (layer === "powder") {
+    dash = texture.powderDash;
+    opacity = texture.powderOpacity;
+  }
+  if (layer === "edge") {
+    dash = texture.edgeDash;
+    opacity = texture.edgeOpacity;
+  }
+  path.style.setProperty("--chalkably-dash", dash);
+  path.style.setProperty("--chalkably-opacity", opacity);
 }
 
 const outlineRect =
@@ -113,33 +157,33 @@ const focusRect =
   (w, h, o) =>
     roughRoundedRect(-1, -1, w + 2, h + 2, r, o);
 
-export type DrawablyButtonState = "idle" | "loading" | "error" | "success";
+export type ChalkablyButtonState = "idle" | "loading" | "error" | "success";
 
-export interface DrawablyButtonOptions extends DrawablyOptions {
+export interface ChalkablyButtonOptions extends ChalkablyOptions {
   variant?: "outline" | "solid" | "scribble";
-  state?: DrawablyButtonState;
+  state?: ChalkablyButtonState;
   tone?: "neutral" | "danger";
 }
 
-export interface ButtonSketch extends Sketch {
-  setState(state: DrawablyButtonState): void;
+export interface ChalkablyButtonSketch extends SketchHandle {
+  setState(state: ChalkablyButtonState): void;
 }
 
-export function drawablyButton(el: HTMLElement, opts: DrawablyButtonOptions = {}): ButtonSketch {
+export function chalkablyButton(el: HTMLElement, opts: ChalkablyButtonOptions = {}): ChalkablyButtonSketch {
   const variant = opts.variant ?? "outline";
   const layers: Layer[] = [];
-  if (variant === "solid") layers.push({ className: "drawably-blob", gen: outlineRect(8) });
+  if (variant === "solid") layers.push({ className: "chalkably-blob", gen: outlineRect(8) });
   if (variant === "scribble")
     layers.push({
-      className: "drawably-scribble",
+      className: "chalkably-scribble",
       gen: (w, h, o) => scribbleFill(INSET + 2, INSET + 2, w - 2 * INSET - 4, h - 2 * INSET - 4, o),
     });
-  layers.push({ className: "drawably-outline", gen: outlineRect(8) });
-  layers.push({ className: "drawably-focus", gen: focusRect(10) });
+  layers.push({ className: "chalkably-outline", gen: outlineRect(8) });
+  layers.push({ className: "chalkably-focus", texture: false, gen: focusRect(10) });
   const sketch = attachChrome(el, layers, opts, true);
-  el.classList.add("drawably-button", `drawably-button--${variant}`);
-  if (opts.tone) el.classList.add(`drawably-button--${opts.tone}`);
-  const setState = (state: DrawablyButtonState) => {
+  el.classList.add("chalkably-button", `chalkably-button--${variant}`);
+  if (opts.tone) el.classList.add(`chalkably-button--${opts.tone}`);
+  const setState = (state: ChalkablyButtonState) => {
     if (state === "idle") delete el.dataset.state;
     else el.dataset.state = state;
   };
@@ -154,9 +198,9 @@ export function drawablyButton(el: HTMLElement, opts: DrawablyButtonOptions = {}
   };
 }
 
-export function drawablyCard(el: HTMLElement, opts: DrawablyOptions = {}): Sketch {
-  const sketch = attachChrome(el, [{ className: "drawably-outline", gen: outlineRect(10) }], opts, false);
-  el.classList.add("drawably-card");
+export function chalkablyCard(el: HTMLElement, opts: ChalkablyOptions = {}): SketchHandle {
+  const sketch = attachChrome(el, [{ className: "chalkably-outline", gen: outlineRect(10) }], opts, false);
+  el.classList.add("chalkably-card");
   return sketch;
 }
 
@@ -164,11 +208,11 @@ function syncedControl(
   el: HTMLElement,
   type: "checkbox" | "radio",
   layers: Layer[],
-  opts: DrawablyOptions,
+  opts: ChalkablyOptions,
   cls: string,
-): Sketch {
+): SketchHandle {
   const input = el?.querySelector?.<HTMLInputElement>(`input[type="${type}"]`);
-  if (!input) throw new Error(`drawably: ${cls} wrapper needs an <input type="${type}">`);
+  if (!input) throw new Error(`chalkably: ${cls} wrapper needs an <input type="${type}">`);
   const sync = () => {
     if (input.checked) el.dataset.checked = "";
     else delete el.dataset.checked;
@@ -191,86 +235,90 @@ function syncedControl(
   };
 }
 
-export function drawablyCheckbox(el: HTMLElement, opts: DrawablyOptions = {}): Sketch {
+export function chalkablyCheckbox(el: HTMLElement, opts: ChalkablyOptions = {}): SketchHandle {
   return syncedControl(
     el,
     "checkbox",
     [
-      { className: "drawably-outline", gen: outlineRect(5) },
+      { className: "chalkably-outline", gen: outlineRect(5) },
       {
-        className: "drawably-check",
+        className: "chalkably-check",
         pathLength: true,
+        texture: false,
         gen: (w, h, o) => roughCheckmark(w * 0.24, h * 0.2, w * 0.52, h * 0.5, o),
       },
-      { className: "drawably-focus", gen: focusRect(7) },
+      { className: "chalkably-focus", texture: false, gen: focusRect(7) },
     ],
     opts,
-    "drawably-checkbox",
+    "chalkably-checkbox",
   );
 }
 
-export function drawablyRadio(el: HTMLElement, opts: DrawablyOptions = {}): Sketch {
+export function chalkablyRadio(el: HTMLElement, opts: ChalkablyOptions = {}): SketchHandle {
   return syncedControl(
     el,
     "radio",
     [
       {
-        className: "drawably-outline",
+        className: "chalkably-outline",
         gen: (w, h, o) => roughCircle(w / 2, h / 2, Math.min(w, h) / 2 - INSET, o),
       },
       {
-        className: "drawably-dot",
+        className: "chalkably-dot",
+        texture: false,
         gen: (w, h, o) => roughCircle(w / 2, h / 2, Math.min(w, h) * 0.18, o),
       },
       {
-        className: "drawably-focus",
+        className: "chalkably-focus",
+        texture: false,
         gen: (w, h, o) => roughCircle(w / 2, h / 2, Math.min(w, h) / 2 + 1, o),
       },
     ],
     opts,
-    "drawably-radio",
+    "chalkably-radio",
   );
 }
 
-export function drawablyToggle(el: HTMLElement, opts: DrawablyOptions = {}): Sketch {
+export function chalkablyToggle(el: HTMLElement, opts: ChalkablyOptions = {}): SketchHandle {
   return syncedControl(
     el,
     "checkbox",
     [
-      { className: "drawably-outline", gen: (w, h, o) => outlineRect((h - 2 * INSET) / 2)(w, h, o) },
+      { className: "chalkably-outline", gen: (w, h, o) => outlineRect((h - 2 * INSET) / 2)(w, h, o) },
       {
-        className: "drawably-blob drawably-knob",
+        className: "chalkably-blob chalkably-knob",
+        texture: false,
         gen: (w, h, o) => roughCircle(h / 2, h / 2, h / 2 - INSET - 3, o),
       },
-      { className: "drawably-focus", gen: focusRect(12) },
+      { className: "chalkably-focus", texture: false, gen: focusRect(12) },
     ],
     opts,
-    "drawably-toggle",
+    "chalkably-toggle",
   );
 }
 
-export function drawablyDivider(el: HTMLElement, opts: DrawablyOptions = {}): Sketch {
+export function chalkablyDivider(el: HTMLElement, opts: ChalkablyOptions = {}): SketchHandle {
   const sketch = attachChrome(
     el,
-    [{ className: "drawably-outline", gen: (w, h, o) => roughLine(INSET, h / 2, w - INSET, h / 2, o) }],
+    [{ className: "chalkably-outline", gen: (w, h, o) => roughLine(INSET, h / 2, w - INSET, h / 2, o) }],
     opts,
     false,
   );
-  el.classList.add("drawably-divider");
+  el.classList.add("chalkably-divider");
   return sketch;
 }
 
-export function drawablyInput(el: HTMLElement, opts: DrawablyOptions = {}): Sketch {
-  if (!el?.querySelector?.("input")) throw new Error("drawably: input wrapper needs an <input>");
+export function chalkablyInput(el: HTMLElement, opts: ChalkablyOptions = {}): SketchHandle {
+  if (!el?.querySelector?.("input")) throw new Error("chalkably: input wrapper needs an <input>");
   const sketch = attachChrome(
     el,
     [
-      { className: "drawably-outline", gen: outlineRect(6) },
-      { className: "drawably-focus", gen: focusRect(8) },
+      { className: "chalkably-outline", gen: outlineRect(6) },
+      { className: "chalkably-focus", texture: false, gen: focusRect(8) },
     ],
     opts,
     false,
   );
-  el.classList.add("drawably-inputbox");
+  el.classList.add("chalkably-inputbox");
   return sketch;
 }
